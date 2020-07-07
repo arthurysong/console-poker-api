@@ -1,6 +1,6 @@
 Rails.application.configure do
   config.middleware.use PokerActionCable 
-  config.web_socket_server_url = "wss://console-poker-api.herokuapp.com/"
+  config.web_socket_server_url = "wss://console-poker-api.herokuapp.com/cable"
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Code is not reloaded between requests.
