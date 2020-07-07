@@ -8,9 +8,3 @@ production:
   adapter: redis
   # url: <%= ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" } %>
   url: redis://redistogo:87c18792a7fa9b384f15fd6d5459490d@pike.redistogo.com:11676/
-  password: 87c18792a7fa9b384f15fd6d5459490d
-  host: tarpon.redistogo.com
-  port: 11676
-  inline: true
-  timeout: 1
-  channel_prefix: console_poker_production
