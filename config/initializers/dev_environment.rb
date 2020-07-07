@@ -1,0 +1,3 @@
+unless Rails.env.production?
+    ENV['SECRET_KEY_BASE'] = "a4469569888e80a58f24fec897e641c2cafa1d4c5b0704973317c6541acefa7ec6e42e6752d3bd51a7d868735b605a11fa501f5d75e399887a6c0db61f15d03b"
+end
