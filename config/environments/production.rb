@@ -1,6 +1,5 @@
 Rails.application.configure do
   config.middleware.use PokerActionCable 
-  config.web_socket_server_url = "wss://console-poker-api.herokuapp.com/cable"
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Code is not reloaded between requests.
@@ -43,7 +42,8 @@ Rails.application.configure do
   # Mount Action Cable outside main process or domain.
   # config.action_cable.mount_path = nil
   # config.action_cable.url = 'wss://example.com/cable'
-  # config.action_cable.allowed_request_origins = [ 'http://example.com', /http:\/\/example.*/ ]
+  config.web_socket_server_url = "wss://console-poker-api.herokuapp.com/cable"
+  config.action_cable.allowed_request_origins = [ 'https://console-poker.herokuapp.com/rooms' ]
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # config.force_ssl = true
