@@ -6,7 +6,6 @@ class AuthenticationController < ApplicationController
     def authenticate
 
         command = AuthenticateUser.call(user_params[:email], user_params[:password])
-        # puts 'tokennnn'
         # puts command.result[:token]
         # puts JsonWebToken.decode(command.result[:token])[:user_id][0]
         if command.success?
