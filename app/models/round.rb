@@ -183,21 +183,13 @@ class Round < ApplicationRecord
     def start_betting_round
         case self.phase
         when PRE_FLOP
-            self.status << " "
-            self.status << "XXXXXXXXX Pre-flop XXXXXXXXX"
-            self.status << " "
+            self.status << "\nXXXXXXXXX Pre-flop XXXXXXXXX\n"
         when FLOP
-            self.status << " "
-            self.status << "XXXXXXXXX Flop XXXXXXXXX"
-            self.status << " "
+            self.status << "\nXXXXXXXXX Flop XXXXXXXXX\n"
         when TURN
-            self.status << " "
-            self.status << "XXXXXXXXX Turn XXXXXXXXX"
-            self.status << " "
+            self.status << "\nXXXXXXXXX Turn XXXXXXXXX\n"
         when RIVER
-            self.status << " "
-            self.status << "XXXXXXXXX River XXXXXXXXX"
-            self.status << " "
+            self.status << "\nXXXXXXXXX River XXXXXXXXX\n"
         end
 
         self.active_players.each do |player| 
@@ -216,8 +208,7 @@ class Round < ApplicationRecord
             self.turn.make_move('raise', SMALL_BLIND, true) # put in blinds for preflop round
             self.turn.make_move('raise', BIG_BLIND, true) # put in blinds for preflop round
         end
-            self.status << " "
-            self.status << "#{turn.username}'s turn."
+            self.status << "\n#{turn.username}'s turn."
         self.save
     end
 
@@ -229,8 +220,7 @@ class Round < ApplicationRecord
         end
 
         unless blinds
-            self.status << " " unless phase_finished?
-            self.status << "#{turn.username}'s turn." unless phase_finished?
+            self.status << "\n#{turn.username}'s turn." unless phase_finished?
             self.turn_count += 1 unless blinds
         end
     end
@@ -249,8 +239,7 @@ class Round < ApplicationRecord
             #what if last person is the small_blind_index and they fold?
             # self.small_blind_index = self.small_blind_index % self.active_players.count
             unless check_if_over
-                self.status << "#{turn.username}'s turn..."
-                self.status << " "
+                self.status << "#{turn.username}'s turn.\n"
             end
             # self.status << "#{turn.username}'s turn..." unless check_if_over
             self.turn_count += 1
