@@ -76,11 +76,6 @@ class Round < ApplicationRecord
     end
 
     def start
-        # self.status << " "
-        # self.status << "================================="
-        # self.status << "================================="
-        # self.status << "================================="
-        # self.status << " "
         self.status << "ROUND STARTING"
         self.game.users.each do |player| 
             player.playing = true 
@@ -332,6 +327,8 @@ class Round < ApplicationRecord
     def initiate_next_phase
         # or if all in, just go to showdown
         if all_in || self.phase == 3 
+            self.phase = 3
+            self.save
             showdown
         else
             self.phase += 1
