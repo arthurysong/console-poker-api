@@ -1,21 +1,11 @@
 TODO:
-Use Custom Checkout form for stripe payments.
-
-Oauth using Google. (Need to deploy app before I can do this...)
-Use atari font for checkoutform.
+Oauth using Google. (Need to deploy app before I can do this...)**
 
 Setting blinds on a game
 All players must be able to afford blinds before playing? What is minimum chips to play??
 
-
-New players should start with 0.
-
-Success message and return to different page
-Update user in redux state when user makes successful deposit
-Display actual card values and symbols
-Format terminal messages more to make the game state more legible
+Format terminal messages more to make the game state more legible**
 Dealer should be going last
 When last person leaves a room just delete it
-When person leaves a room, the redux store should update their chips..
 
 When you're online, you can see friends, you can add friends

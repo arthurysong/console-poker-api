@@ -68,7 +68,7 @@ ActiveRecord::Schema.define(version: 2020_06_12_003235) do
     t.integer "round_id"
     t.boolean "playing"
     t.integer "round_bet"
-    t.integer "chips", default: 100000
+    t.integer "chips", default: 0
     t.string "cards"
     t.boolean "dealer", default: false
     t.datetime "created_at", precision: 6, null: false

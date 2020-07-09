@@ -76,12 +76,12 @@ class Round < ApplicationRecord
     end
 
     def start
-        self.status << " "
-        self.status << "================================="
-        self.status << "================================="
-        self.status << "================================="
-        self.status << " "
-        self.status << "...Round starting..."
+        # self.status << " "
+        # self.status << "================================="
+        # self.status << "================================="
+        # self.status << "================================="
+        # self.status << " "
+        self.status << "ROUND STARTING"
         self.game.users.each do |player| 
             player.playing = true 
             player.dealer = false
@@ -137,7 +137,7 @@ class Round < ApplicationRecord
     end
 
     def set_cards
-        self.status << "...Dealing cards..."
+        # self.status << "...Dealing cards..."
         deck = []
         ['c', 'd', 'h', 's'].each do |color|
             [2, 3, 4, 5, 6, 7, 8, 9, 'T', 'J', 'Q', 'K', 'A'].each do |number|
@@ -185,15 +185,19 @@ class Round < ApplicationRecord
         when PRE_FLOP
             self.status << " "
             self.status << "XXXXXXXXX Pre-flop XXXXXXXXX"
+            self.status << " "
         when FLOP
             self.status << " "
             self.status << "XXXXXXXXX Flop XXXXXXXXX"
+            self.status << " "
         when TURN
             self.status << " "
             self.status << "XXXXXXXXX Turn XXXXXXXXX"
+            self.status << " "
         when RIVER
             self.status << " "
             self.status << "XXXXXXXXX River XXXXXXXXX"
+            self.status << " "
         end
 
         self.active_players.each do |player| 
@@ -212,7 +216,8 @@ class Round < ApplicationRecord
             self.turn.make_move('raise', SMALL_BLIND, true) # put in blinds for preflop round
             self.turn.make_move('raise', BIG_BLIND, true) # put in blinds for preflop round
         end
-        self.status << "#{turn.username}'s turn."
+            self.status << " "
+            self.status << "#{turn.username}'s turn."
         self.save
     end
 
@@ -224,6 +229,7 @@ class Round < ApplicationRecord
         end
 
         unless blinds
+            self.status << " " unless phase_finished?
             self.status << "#{turn.username}'s turn." unless phase_finished?
             self.turn_count += 1 unless blinds
         end
@@ -242,8 +248,11 @@ class Round < ApplicationRecord
             
             #what if last person is the small_blind_index and they fold?
             # self.small_blind_index = self.small_blind_index % self.active_players.count
-
-            self.status << "#{turn.username}'s turn..." unless check_if_over
+            unless check_if_over
+                self.status << "#{turn.username}'s turn..."
+                self.status << " "
+            end
+            # self.status << "#{turn.username}'s turn..." unless check_if_over
             self.turn_count += 1
             self.save
         elsif command == "check"
@@ -387,7 +396,7 @@ class Round < ApplicationRecord
         last_player.save
 
         self.is_playing = false
-        self.status << "#{last_player.username} wins #{self.pot}!"
+        self.status << "\n#{last_player.username} wins #{self.pot}!"
         self.save
     end
 
