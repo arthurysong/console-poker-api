@@ -3,11 +3,17 @@ class Game < ApplicationRecord
     has_many :users
     has_many :rounds
 
+    BIG_BLIND = 400
+
     def as_json(options = {})
         super(only: [:id], methods: [:active_round], include: [:users])
         # super(only: [:id])
     end 
 
+    def self.BIG_BLIND
+        BIG_BLIND
+    end
+    
     def active_round
         self.rounds.last
     end
@@ -23,5 +29,12 @@ class Game < ApplicationRecord
             new_round.save
             new_round.start
         end
+    end
+
+    def players_have_enough_money?
+        self.users.each do |u|
+            return false if u.chips < BIG_BLIND
+        end
+        true
     end
 end

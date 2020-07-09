@@ -13,15 +13,22 @@ class GamesController < ApplicationController
     def start
         game = Game.find(params[:id])
         if game.users.count > 1
-            if !game.active_round
-                game.start
-                ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
-            else
-                if !game.active_round.is_playing
+            if !game.active_round #for when game hasn't been started yet.
+                if !game.players_have_enough_money?
+                    ActionCable.server.broadcast("game_#{game.id}", { type: "errors", error: "All players must be able to afford Big Blind: #{Game.BIG_BLIND}." })
+                else
                     game.start
-                    # game.save
-
                     ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
+                end
+            else #for when game has one round at least...
+                if !game.active_round.is_playing
+                    if !game.players_have_enough_money?
+                        ActionCable.server.broadcast("game_#{game.id}", { type: "errors", error: "All players must be able to afford Big Blind: #{Game.BIG_BLIND}." })
+                    else
+                        game.start
+
+                        ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
+                    end
                 else
                     ActionCable.server.broadcast("game_#{game.id}", { type: "errors", error: "Round is still playing." })
                 end
