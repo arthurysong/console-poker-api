@@ -37,7 +37,7 @@ class Round < ApplicationRecord
     end
 
     def turn= (user)
-        self.active_players.each_with_index do |u, i|
+        self.ordered_users.each_with_index do |u, i|
             if user == u
                 self.turn_index = i
                 self.save
@@ -90,7 +90,7 @@ class Round < ApplicationRecord
             player.save
         end
 
-        dealer_index = self.small_blind_index + 2
+        dealer_index = self.small_blind_index - 1
         dealer_index = dealer_index % self.users.length
         self.ordered_users[dealer_index].dealer = true
         
