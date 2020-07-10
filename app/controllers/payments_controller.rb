@@ -3,10 +3,43 @@ require 'stripe'
 class PaymentsController < ApplicationController
     skip_before_action :authenticate_request
     Stripe.api_key = "sk_test_51GqNn2Kj8jVe4aIuNY5sxkfGCrpv5HAPSmMQdzkpJkvnTNYk2LCMQ0TD9jRpG9G8HmwmrUZRiizGcc2sFHaxgeEo00RsFY5nMT"
-    state = "5868fb4435bde2653f0621f92e5fdcfb"
+    
 
     def state
-        render json: { state: state }
+        render json: { state: ENV['STATE'] }
+    end
+
+    def connect
+        state = params[:state]
+        if state != ENV['STATE']
+            render json: { error: 'Invalid state parameter: ' + state }, status: 403
+        end
+
+        code = params[:code]
+        begin
+            response = Stripe::OAuth.token({
+            grant_type: 'authorization_code',
+            code: code,
+            })
+        rescue Stripe::OAuth::InvalidGrantError
+            status 400
+            return {error: 'Invalid authorization code: ' + code}.to_json
+        rescue Stripe::StripeError
+            status 500
+            return {error: 'An unknown error occurred.'}.to_json
+        end
+
+        connected_account_id = response.stripe_user_id
+        save_account_id(connected_account_id)
+
+        # Render some HTML or redirect to a different page.
+        status 200
+        {success: true}.to_json
+    end
+
+    def save_account_id(id)
+        current_user.connect_account_id = id
+        current_user.save
     end
     
     def secret
