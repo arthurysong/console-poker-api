@@ -3,6 +3,11 @@ require 'stripe'
 class PaymentsController < ApplicationController
     skip_before_action :authenticate_request
     Stripe.api_key = "sk_test_51GqNn2Kj8jVe4aIuNY5sxkfGCrpv5HAPSmMQdzkpJkvnTNYk2LCMQ0TD9jRpG9G8HmwmrUZRiizGcc2sFHaxgeEo00RsFY5nMT"
+    state = "5868fb4435bde2653f0621f92e5fdcfb"
+
+    def state
+        render json: { state: state }
+    end
     
     def secret
         # puts params[:amount]
