@@ -35,7 +35,7 @@ class PaymentsController < ApplicationController
         render json: { success: true, user: user }, status: 200
     end
 
-    def save_account_id(connect_id)
+    def save_account_id(connect_id, user)
         user.connect_account_id = connect_id
         user.save
     end

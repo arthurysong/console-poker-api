@@ -10,6 +10,15 @@ class User < ApplicationRecord
     #playing
     #cards
     #dealer
+
+    def as_json(options = {})
+        super(methods: [:connected?])
+    end 
+
+    def connected?
+        self.connect_account_id == nil ? false : true
+    end
+
     def self.find_or_create_by_email(email, username)
         if user = User.find_by(:email => email)
             return user
