@@ -3,8 +3,16 @@ require 'pry'
 class AuthenticationController < ApplicationController
     skip_before_action :authenticate_request
 
+    # def google
+        # puts 'hello'
+        # render json: { message: "hi" }
+        # redirect_to '/auth/google_oauth2'
+    # end
+    
     def authenticate
-
+        if request.env['omniauth.auth']
+            render json: { auth_hash: 'yes' }
+        end
         command = AuthenticateUser.call(user_params[:email], user_params[:password])
         # puts command.result[:token]
         # puts JsonWebToken.decode(command.result[:token])[:user_id][0]

@@ -30,6 +30,7 @@ gem 'stripe'
 gem 'simple_command'
 gem 'rack-cors'
 gem 'omniauth-google-oauth2'
+gem 'figaro'
 
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
