@@ -10,17 +10,20 @@ class AuthenticationController < ApplicationController
     # end
     
     def authenticate
-        if request.env['omniauth.auth']
-            render json: { auth_hash: 'yes' }
-        end
-        command = AuthenticateUser.call(user_params[:email], user_params[:password])
+        puts params
+        if user_params[:site] == "google"
+            puts 'hi'
+            redirect_to '/auth/google_oauth2'
+        else
+            command = AuthenticateUser.call(user_params[:email], user_params[:password])
         # puts command.result[:token]
         # puts JsonWebToken.decode(command.result[:token])[:user_id][0]
-        if command.success?
-            render json: { auth_token: command.result[:token], user: command.result[:user] }
-        else
-            render json: { errors: command.errors[:user_authentication] }, status: :unauthorized
-        end
+            if command.success?
+                render json: { auth_token: command.result[:token], user: command.result[:user] }
+            else
+                render json: { errors: command.errors[:user_authentication] }, status: :unauthorized
+            end
+        end 
     end
 
     def set_login
@@ -34,6 +37,6 @@ class AuthenticationController < ApplicationController
     end
 
     def user_params
-        params.permit(:email, :password)
+        params.permit(:email, :password, :site)
     end
 end
