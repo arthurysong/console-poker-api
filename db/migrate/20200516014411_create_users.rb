@@ -7,7 +7,7 @@ class CreateUsers < ActiveRecord::Migration[6.0]
       t.integer :room_id
       
       #stripe connect account
-      t.integer :connect_account_id
+      t.string :connect_account_id
 
       #for playing poker
       t.integer :game_id

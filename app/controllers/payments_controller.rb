@@ -1,7 +1,7 @@
 require 'stripe'
 
 class PaymentsController < ApplicationController
-    skip_before_action :authenticate_request
+    skip_before_action :authenticate_request, except: :connect
     Stripe.api_key = "sk_test_51GqNn2Kj8jVe4aIuNY5sxkfGCrpv5HAPSmMQdzkpJkvnTNYk2LCMQ0TD9jRpG9G8HmwmrUZRiizGcc2sFHaxgeEo00RsFY5nMT"
     
 
@@ -22,29 +22,24 @@ class PaymentsController < ApplicationController
             code: code,
             })
         rescue Stripe::OAuth::InvalidGrantError
-            status 400
-            return {error: 'Invalid authorization code: ' + code}.to_json
+            render json: {error: 'Invalid authorization code: ' + code}, status: 400
         rescue Stripe::StripeError
-            status 500
-            return {error: 'An unknown error occurred.'}.to_json
+            render json: {error: 'An unknown error occurred.'}, status: 500
         end
 
         connected_account_id = response.stripe_user_id
         save_account_id(connected_account_id)
 
         # Render some HTML or redirect to a different page.
-        status 200
-        {success: true}.to_json
+        render json: { success: true }, status: 200
     end
 
-    def save_account_id(id)
-        current_user.connect_account_id = id
+    def save_account_id(connect_id)
+        current_user.connect_account_id = connect_id
         current_user.save
     end
     
     def secret
-        # puts params[:amount]
-        # puts params[:amount].gsub(/[,.]/,'').to_i
         puts params[:amount]
         amount = params[:amount].delete(',').to_i
         puts amount
