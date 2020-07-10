@@ -12,10 +12,10 @@ class User < ApplicationRecord
     #dealer
 
     def as_json(options = {})
-        super(methods: [:connected?])
+        super(methods: [:connected])
     end 
 
-    def connected?
+    def connected
         self.connect_account_id == nil ? false : true
     end
 
