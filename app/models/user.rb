@@ -10,6 +10,13 @@ class User < ApplicationRecord
     #playing
     #cards
     #dealer
+    def self.find_or_create_by_email(email, username)
+        if user = User.find_by(:email => email)
+            return user
+        else
+            user = User.create(:email => email, :username => username, :password => SecureRandom.hex)
+        end
+    end
 
     def is_move_valid?
         self.round && self.round.turn == self

@@ -11,9 +11,10 @@ class AuthenticationController < ApplicationController
     
     def authenticate
         puts params
-        if user_params[:site] == "google"
-            puts 'hi'
-            redirect_to '/auth/google_oauth2'
+        if user_params[:site]
+            user = User.find_or_create_by_email(user_params[:email], user_params[:username])
+            token = JsonWebToken.encode(user_id: user.id)
+            render json: { auth_token: token, user: user }
         else
             command = AuthenticateUser.call(user_params[:email], user_params[:password])
         # puts command.result[:token]
@@ -26,6 +27,7 @@ class AuthenticationController < ApplicationController
         end 
     end
 
+        # puts JsonWebToken.decode(command.result[:token])[:user_id][0]
     def set_login
         # puts 'hello??'
         @current_user = AuthorizeApiRequest.call(request.headers).result
@@ -37,6 +39,6 @@ class AuthenticationController < ApplicationController
     end
 
     def user_params
-        params.permit(:email, :password, :site)
+        params.permit(:email, :password, :site, :username)
     end
 end

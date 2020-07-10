@@ -8,8 +8,9 @@ Rails.application.routes.draw do
   end
 
   resources :users
-  get '/auth/:site', to: 'authentication#authenticate'
-  # post '/auth/google/callback', to: 'authentication#authenticate'
+  post '/auth/:site', to: 'authentication#authenticate'
+  # get '/auth/google/callback', to: 'authentication#authenticate'
+  # get /auth/:
 
   post '/rooms/:id/authenticate', to: 'rooms#authenticate'
 

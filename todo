@@ -2,5 +2,6 @@ TODO:
 Oauth using Google. (Need to deploy app before I can do this...)**
 
 When last person leaves a room just delete it
+Validations for User model
 
 When you're online, you can see friends, you can add friends
