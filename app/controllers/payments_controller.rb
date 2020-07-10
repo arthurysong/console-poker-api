@@ -28,15 +28,16 @@ class PaymentsController < ApplicationController
         end
 
         connected_account_id = response.stripe_user_id
-        save_account_id(connected_account_id)
+        user = current_user
+        save_account_id(connected_account_id, user)
 
         # Render some HTML or redirect to a different page.
-        render json: { success: true }, status: 200
+        render json: { success: true, user: user }, status: 200
     end
 
     def save_account_id(connect_id)
-        current_user.connect_account_id = connect_id
-        current_user.save
+        user.connect_account_id = connect_id
+        user.save
     end
     
     def secret
