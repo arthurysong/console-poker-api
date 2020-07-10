@@ -5,6 +5,9 @@ class CreateUsers < ActiveRecord::Migration[6.0]
       t.string :email
       t.string :password_digest
       t.integer :room_id
+      
+      #stripe connect account
+      t.integer :connect_account_id
 
       #for playing poker
       t.integer :game_id

@@ -64,6 +64,7 @@ ActiveRecord::Schema.define(version: 2020_06_12_003235) do
     t.string "email"
     t.string "password_digest"
     t.integer "room_id"
+    t.integer "connect_account_id"
     t.integer "game_id"
     t.integer "round_id"
     t.boolean "playing"
