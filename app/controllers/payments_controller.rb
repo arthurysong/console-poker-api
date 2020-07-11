@@ -55,8 +55,8 @@ class PaymentsController < ApplicationController
     def transfer_secret
         amount = params[:amount].delete(',').to_i
         user = current_user
-        puts amount
-        puts user.username
+        # puts amount
+        # puts user.username
 
         chips = amount * 100
 

@@ -12,11 +12,32 @@ class User < ApplicationRecord
     #dealer
 
     def as_json(options = {})
-        super(methods: [:connected])
+        super(methods: [:connected, :possible_moves])
     end 
 
     def connected
         self.connect_account_id == nil ? false : true
+    end
+
+    def possible_moves
+        moves = []
+        if !self.round || !self.playing
+            moves
+        elsif self.round && self.round.is_playing
+            if self.round.turn != self
+                moves
+            else
+                #what moves do i have?
+                moves << "Fold"
+                moves << "Raise"
+                if self.round_bet == self.round.highest_bet_for_phase
+                    moves << "Check"
+                elsif self.round_bet < self.round.highest_bet_for_phase
+                    moves << "Call"
+                end
+                moves
+            end
+        end
     end
 
     def self.find_or_create_by_email(email, username)
