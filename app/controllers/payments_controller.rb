@@ -2,8 +2,7 @@ require 'stripe'
 
 class PaymentsController < ApplicationController
     skip_before_action :authenticate_request, except: [:connect, :transfer_secret]
-    Stripe.api_key = "sk_test_51GqNn2Kj8jVe4aIuNY5sxkfGCrpv5HAPSmMQdzkpJkvnTNYk2LCMQ0TD9jRpG9G8HmwmrUZRiizGcc2sFHaxgeEo00RsFY5nMT"
-    
+    Stripe.api_key = ENV['STRIPE_KEY']
 
     def state
         render json: { state: ENV['STATE'] }
