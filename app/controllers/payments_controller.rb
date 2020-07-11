@@ -1,7 +1,7 @@
 require 'stripe'
 
 class PaymentsController < ApplicationController
-    skip_before_action :authenticate_request, except: :connect
+    skip_before_action :authenticate_request, except: :connect, :transfer_secret
     Stripe.api_key = "sk_test_51GqNn2Kj8jVe4aIuNY5sxkfGCrpv5HAPSmMQdzkpJkvnTNYk2LCMQ0TD9jRpG9G8HmwmrUZRiizGcc2sFHaxgeEo00RsFY5nMT"
     
 
@@ -51,6 +51,18 @@ class PaymentsController < ApplicationController
             metadata: {integration_check: 'accept_a_payment'},
           })
         render json: { client_secret: intent.client_secret }
+    end
+
+    def transfer_secret
+        amount = params[:amount].delete(',').to_i
+        user = current_user
+        transfer = Stripe::Transfer.create({
+            amount: amount,
+            currency: "usd",
+            destination: user.connect_account_id
+        })
+
+        render json: { success: true, message: "#{amount} withdrawn!" }
     end
 
     private

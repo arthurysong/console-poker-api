@@ -27,6 +27,7 @@ Rails.application.routes.draw do
 
   #payments
   get '/secret/:amount', to: 'payments#secret'
+  get '/transfer_secret/:amount', to: 'payments#transfer_secret'
   get '/stripe_state', to: 'payments#state';
   get '/connect/oauth', to: 'payments#connect';
 
