@@ -98,7 +98,7 @@ class Round < ApplicationRecord
     end
 
     def player_has_left(user_id)
-        user = self.active_players.detect {|u| u.id == user_id}
+        user = self.ordered_users.detect {|u| u.id == user_id}
         
         self.status << "#{user.username} has left the game."
         self.save
