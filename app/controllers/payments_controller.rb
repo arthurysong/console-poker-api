@@ -55,13 +55,24 @@ class PaymentsController < ApplicationController
     def transfer_secret
         amount = params[:amount].delete(',').to_i
         user = current_user
-        transfer = Stripe::Transfer.create({
-            amount: amount,
-            currency: "usd",
-            destination: user.connect_account_id
-        })
+        puts amount
+        puts user.username
 
-        render json: { success: true, message: "#{amount} withdrawn!" }
+        chips = amount * 100
+
+        if user.chips < chips
+            render json: { error: "User does not have enough chips" }, status: 400
+        else 
+            user.chips -= chips
+            user.save
+            transfer = Stripe::Transfer.create({
+                amount: amount,
+                currency: "usd",
+                destination: user.connect_account_id
+            })
+
+            render json: { success: true, message: "#{chips} exchanged! USD amount will be transferred to debit/bank.", user: user }
+        end
     end
 
     private
