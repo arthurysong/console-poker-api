@@ -53,6 +53,7 @@ ActiveRecord::Schema.define(version: 2020_06_12_003235) do
     t.integer "highest_bet_for_phase", default: 0
     t.string "community_cards"
     t.text "status", default: [], array: true
+    t.text "result", default: [], array: true
     t.boolean "is_playing", default: false
     t.boolean "all_in", default: false
     t.datetime "created_at", precision: 6, null: false

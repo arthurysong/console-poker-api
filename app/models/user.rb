@@ -35,6 +35,7 @@ class User < ApplicationRecord
                 elsif self.round_bet < self.round.highest_bet_for_phase
                     moves << "Call"
                 end
+                moves << "All In"
                 moves
             end
         end

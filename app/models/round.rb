@@ -15,6 +15,7 @@ class Round < ApplicationRecord
     #community_cards
     #all_in
     #status
+    #result
 
     PRE_FLOP = 0
     FLOP = 1
@@ -25,7 +26,7 @@ class Round < ApplicationRecord
     BIG_BLIND = 400
 
     def as_json(options = {})
-        super(only: [:id, :status, :pot, :highest_bet_for_phase, :is_playing, :phase], methods: [:access_community_cards, :ordered_users, :turn])
+        super(only: [:id, :status, :pot, :highest_bet_for_phase, :is_playing, :phase, :result], methods: [:access_community_cards, :ordered_users, :turn])
     end 
 
     def ordered_users
@@ -355,6 +356,8 @@ class Round < ApplicationRecord
         if best_players.count == 1
             self.status << "#{best_players[0].username} has the best hand with #{best_hands[0]}"
             self.status << "#{best_players[0].username} wins #{self.pot}!"
+            self.result << "#{best_players[0].username} has the best hand with #{best_hands[0]}"
+            self.result << "#{best_players[0].username} wins #{self.pot}!"
         else
             string = "Tie!"
             best_players.each_with_index do |player, index|
@@ -363,6 +366,7 @@ class Round < ApplicationRecord
             end
             self.status << string
             self.status << "#{self.pot} is split between the winners."
+            self.result << "#{self.pot} is split between the winners."
         end
 
         split = self.pot / best_players.count
@@ -383,6 +387,7 @@ class Round < ApplicationRecord
 
         self.is_playing = false
         self.status << "\n#{last_player.username} wins #{self.pot}!"
+        self.result << "\n#{last_player.username} wins #{self.pot}!"
         self.save
     end
 

@@ -12,6 +12,7 @@ class CreateRounds < ActiveRecord::Migration[6.0]
       t.integer :highest_bet_for_phase, :default => 0
       t.string :community_cards
       t.text :status, array: true, :default => []
+      t.text :result, array: true, :default => []
       t.boolean :is_playing, :default => false
       t.boolean :all_in, :default => false
 
