@@ -71,7 +71,7 @@ class PaymentsController < ApplicationController
                 destination: user.connect_account_id
             })
 
-            render json: { success: true, message: "#{chips} exchanged! USD amount will be transferred to debit/bank.", user: user }
+            render json: { success: true, message: "#{chips} chips exchanged! USD amount will be transferred to debit/bank.", user: user }
         end
     end
 
