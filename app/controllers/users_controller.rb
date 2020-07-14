@@ -20,7 +20,7 @@ class UsersController < ApplicationController
 
     def return_cards
         @current_user.return_cards
-        render json: { success: "#{user.username} has returned their cards" }, status: 201
+        render json: { success: "#{@current_user.username} has returned their cards", user: @current_user }, status: 201
     end
 
     def make_move
