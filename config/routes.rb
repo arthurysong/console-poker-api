@@ -20,7 +20,7 @@ Rails.application.routes.draw do
   post '/users/:id/return_cards', to: 'users#return_cards'
 
   post '/games/:id/start', to: 'games#start'
-  post '/games/:id/join', to: 'games#join'
+  post '/games/:id/join', to: 'games#join_game'
 
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   post '/authenticate', to: 'authentication#authenticate'
