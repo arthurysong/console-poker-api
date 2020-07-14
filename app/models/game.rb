@@ -6,7 +6,7 @@ class Game < ApplicationRecord
     BIG_BLIND = 400
 
     def as_json(options = {})
-        super(only: [:id], methods: [:active_round, :ordered_users], include: [:users])
+        super(only: [:id], methods: [:active_round, :ordered_users, :startable], include: [:users])
         # super(only: [:id])
     end 
 
@@ -34,6 +34,13 @@ class Game < ApplicationRecord
             new_round.start
         end
         self.save
+    end
+
+    def startable
+        if self.users.count > 1 && !self.active_round.is_playing && self.players_have_enough_money?
+            return true
+        end
+        false
     end
 
     def players_have_enough_money?
