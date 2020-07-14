@@ -6,12 +6,16 @@ class Game < ApplicationRecord
     BIG_BLIND = 400
 
     def as_json(options = {})
-        super(only: [:id], methods: [:active_round], include: [:users])
+        super(only: [:id], methods: [:active_round, :ordered_users], include: [:users])
         # super(only: [:id])
     end 
 
     def self.BIG_BLIND
         BIG_BLIND
+    end
+
+    def ordered_users
+        self.users.sort{|a,b| a.id <=> b.id}
     end
     
     def active_round
