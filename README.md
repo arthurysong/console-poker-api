@@ -17,7 +17,7 @@ EXP Date: Any future date
 Zip Code: Any Zipcode
 
 ## Set Up
-1. Clone the application: git clone
-2. Install required gems: bundle install
-3. Create, Migrate, and seed DB: rake db:create, rake db:migrate, rake db:seed
-4. Run rails server: rails s
+1. Clone the application: `git clone`
+2. Install required gems: `bundle install`
+3. Create, Migrate, and Seed DB: `rake db:create`, `rake db:migrate`, `rake db:seed`
+4. Run rails server: `rails s`
