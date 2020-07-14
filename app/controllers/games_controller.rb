@@ -22,12 +22,13 @@ class GamesController < ApplicationController
     def leave_game
         game = Game.find(params[:id])
         game.users.delete(@current_user)
+        @current_user.reset_user
         @current_user.save
         
         ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
         render json: { success: "#{@current_user.username} has left the game."}, status: 201
     end
-    
+
     def start
         game = Game.find(params[:id])
         if game.users.count > 1
