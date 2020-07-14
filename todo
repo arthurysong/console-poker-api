@@ -3,5 +3,6 @@ Oauth using Google. (Need to deploy app before I can do this...)**
 
 When last person leaves a room just delete it
 Validations for User model
+Use @current_user instance variable instead of calling current_user for each time you need logged in user.
 
 When you're online, you can see friends, you can add friends

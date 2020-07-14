@@ -21,6 +21,7 @@ Rails.application.routes.draw do
 
   post '/games/:id/start', to: 'games#start'
   post '/games/:id/join', to: 'games#join_game'
+  post '/games/:id/leave', to: 'games#leave_game'
 
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   post '/authenticate', to: 'authentication#authenticate'
