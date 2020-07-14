@@ -15,6 +15,11 @@ class User < ApplicationRecord
         super(methods: [:connected, :possible_moves])
     end 
 
+    def return_cards
+        self.cards = ""
+        self.save
+    end
+
     def connected
         self.connect_account_id == nil ? false : true
     end
