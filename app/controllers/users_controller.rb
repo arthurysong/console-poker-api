@@ -29,7 +29,7 @@ class UsersController < ApplicationController
         if current_user.round
             current_user.make_move(params["command"], params["amount"])
 
-            ActionCable.server.broadcast("game_#{game.id}", { type: "update_round", round: current_user.round })
+            ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
 
             render json: { message: "Move Success." }
         else

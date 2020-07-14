@@ -33,6 +33,7 @@ class Game < ApplicationRecord
             new_round.save
             new_round.start
         end
+        self.save
     end
 
     def players_have_enough_money?

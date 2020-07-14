@@ -21,7 +21,16 @@ class GamesController < ApplicationController
 
     def leave_game
         game = Game.find(params[:id])
+
+        if @current_user.round #if @current_user is in a round
+            if @current_user.round.is_playing #if @current_user is in a round and is playing..
+              @current_user.leave_round
+            end
+        end
+
         game.users.delete(@current_user)
+
+        # i need to make sure they fold the hand they're in...
         @current_user.reset_user
         @current_user.save
         
@@ -31,33 +40,22 @@ class GamesController < ApplicationController
 
     def start
         game = Game.find(params[:id])
-        if game.users.count > 1
-            if !game.active_round #for when game hasn't been started yet.
-                if !game.players_have_enough_money?
-                    ActionCable.server.broadcast("game_#{game.id}", { type: "errors", error: "All players must be able to afford Big Blind: #{Game.BIG_BLIND}." })
-                else
-                    game.start
-                    ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
-                end
-            else #for when game has one round at least...
-                if !game.active_round.is_playing
-                    if !game.players_have_enough_money?
-                        ActionCable.server.broadcast("game_#{game.id}", { type: "errors", error: "All players must be able to afford Big Blind: #{Game.BIG_BLIND}." })
-                    else
-                        game.start
-
-                        ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
-                    end
-                else
-                    ActionCable.server.broadcast("game_#{game.id}", { type: "errors", error: "Round is still playing." })
-                end
-            end
-        else
+        if game.users.count <= 1
             ActionCable.server.broadcast("game_#{game.id}", { type: "errors", error: "Game must have more than one player." })
+            render json: { error: "Game must have more than one player." }
+        elsif !game.players_have_enough_money?
+            ActionCable.server.broadcast("game_#{game.id}", { type: "errors", error: "All players must be able to afford Big Blind: #{Game.BIG_BLIND}." })
+            render json: { error: "All players must be able to afford Big Blind" }
+        elsif !game.active_round || !game.active_round.is_playing# if there isn't an active round start the game && !game.active_round.is_playing
+            game.start
+            game = Game.find(params[:id])
+
+            ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
+            render json: { success: "New Round started" }
+        else
+            ActionCable.server.broadcast("game_#{game.id}", { type: "errors", error: "Round is still playing." })
+            render json: { error: "Round is still playing." }
         end
-
-        
-
-        render json: game
     end
+
 end
