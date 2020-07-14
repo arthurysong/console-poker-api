@@ -15,8 +15,10 @@ class User < ApplicationRecord
         super(methods: [:connected, :possible_moves])
     end 
 
-    def return_cards
+    def reset_user
         self.cards = ""
+        self.round_bet = 0
+        self.dealer = false
         self.save
     end
 

@@ -18,9 +18,9 @@ class UsersController < ApplicationController
         end
     end
 
-    def return_cards
-        @current_user.return_cards
-        render json: { success: "#{@current_user.username} has returned their cards", user: @current_user }, status: 201
+    def reset_user
+        @current_user.reset_user
+        render json: { success: "#{@current_user.username} has returned their cards, and reset info.", user: @current_user }, status: 201
     end
 
     def make_move
