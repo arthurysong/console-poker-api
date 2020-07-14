@@ -2,10 +2,10 @@ require 'pry'
 
 class GameChannel < ApplicationCable::Channel
   def subscribed
-    user = find_verified_user
+    # user = find_verified_user
     game = Game.find(params["game"])
-    game.users << user
-    user.save
+    # game.users << user
+    # user.save
 
     stream_from "game_#{game.id}"
 

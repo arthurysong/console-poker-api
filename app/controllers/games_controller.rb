@@ -9,6 +9,15 @@ class GamesController < ApplicationController
             end
         end
     end
+
+    def join_game
+        game = Game.find(params[:id])
+        game.users << @current_user
+        @current_user.save
+
+        ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
+        render json: { success: "#{@current_user} has joined game."}, status: 201
+    end
     
     def start
         game = Game.find(params[:id])

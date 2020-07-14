@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   get '/users/:id/get_chips', to: 'users#get_chips'
 
   post '/games/:id/start', to: 'games#start'
+  post '/games/:id/join', to: 'games#join'
 
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
   post '/authenticate', to: 'authentication#authenticate'
