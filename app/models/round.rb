@@ -342,7 +342,7 @@ class Round < ApplicationRecord
         best_players = []
         # phase = 3
         active_players.each_with_index do |player, index|
-            hand = Holdem::PokerHand.new(player.cards + " " + self.community_cards)
+            hand = PokerHand.new(player.cards + " " + self.community_cards)
             if index == 0 || hand == best_hands[0]
                 best_hands << hand
                 best_players << player

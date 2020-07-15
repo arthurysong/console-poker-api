@@ -5,7 +5,7 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
-marley = User.create({ username: 'Marley', email: 'dog@gmail.com', password: "123456", chips: 10000000000000000000 })
+marley = User.create({ username: 'Marley', email: 'dog@gmail.com', password: "123456", chips: 100000000 })
 
 room = Room.create(name: 'Play with Marley')
 room.users << marley

@@ -176,6 +176,7 @@ GEM
       ffi (~> 1.0)
     redis (4.2.1)
     regexp_parser (1.7.1)
+    ruby-poker (1.0.1)
     rubyzip (2.3.0)
     sass-rails (6.0.0)
       sassc-rails (~> 2.1, >= 2.1.1)
@@ -254,6 +255,7 @@ DEPENDENCIES
   rack-cors
   rails (~> 6.0.3)
   redis (~> 4.0)
+  ruby-poker
   sass-rails (>= 6)
   selenium-webdriver
   shotgun

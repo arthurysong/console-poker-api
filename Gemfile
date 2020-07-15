@@ -23,6 +23,7 @@ gem 'redis', '~> 4.0'
 # Use Active Model has_secure_password
 gem 'bcrypt', '~> 3.1.7'
 gem 'holdem'
+gem 'ruby-poker'
 gem 'shotgun'
 gem 'foreman'
 gem 'jwt'

@@ -37,7 +37,7 @@ class Game < ApplicationRecord
     end
 
     def startable
-        if self.users.count > 1 && !self.active_round.is_playing && self.players_have_enough_money?
+        if !self.active_round  || (self.users.count > 1 && !self.active_round.is_playing && self.players_have_enough_money?)
             return true
         end
         false
