@@ -37,6 +37,15 @@ class UsersController < ApplicationController
         end
     end
 
+    def marley_call
+        user = User.find_by(username: "Marley")
+        game = user.game
+
+        user.make_move("call")
+        ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
+        render json: { message: "Move Success." }
+    end
+
     def get_chips
         chips = current_user.chips
         render json: { chips: chips }, status: 200

@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   post '/users/:id/add_chips', to: 'users#add_chips' # do i need to have id in route?
   get '/users/:id/get_chips', to: 'users#get_chips'
   post '/users/:id/reset_user', to: 'users#reset_user'
+  post '/users/marley_call', to: 'users#marley_call'
 
   post '/games/:id/start', to: 'games#start'
   post '/games/:id/join', to: 'games#join_game'
