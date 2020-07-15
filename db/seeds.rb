@@ -5,8 +5,12 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+marley = User.create({ username: 'Marley', email: 'dog@gmail.com', password: "123456", chips: 10000000000000000000 })
 
-room = Room.create(name: 'PakkFlow')
+room = Room.create(name: 'Play with Marley')
+room.users << marley
+marley.save
+
 room2 = Room.create(name: 'Omegacucks')
 
 users = User.create([
@@ -40,4 +44,7 @@ messages = Message.create([
 ])
 
 game = Game.create(room_id: room.id)
+game.users << marley
+marley.save
+
 game2 = Game.create(room_id: room2.id)
