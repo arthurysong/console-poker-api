@@ -357,12 +357,13 @@ class Round < ApplicationRecord
         if best_players.count == 1
             self.status << "#{best_players[0].username} has the best hand with #{best_hands[0]}"
             self.status << "#{best_players[0].username} wins #{self.pot}!"
-            self.result << "#{best_players[0].username} has the best hand with #{best_hands[0]}"
-            self.result << "#{best_players[0].username} wins #{self.pot}!"
+            # self.result << "#{best_players[0].username} has the best hand with #{best_hands[0]}"
+            # self.result << "#{best_players[0].username} wins #{self.pot}!"
+            self.result << "#{best_players[0].username} wins #{self.pot} with #{best_hands[0].rank}"
         else
             string = "Tie!"
             best_players.each_with_index do |player, index|
-                string += "\n#{player.username} has #{best_hands[index]}"
+                string += "\n#{player.username} has #{best_hands[index].rank}"
                 
             end
             self.status << string

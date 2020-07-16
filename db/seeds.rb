@@ -11,7 +11,7 @@ room = Room.create(name: 'Play with Marley')
 room.users << marley
 marley.save
 
-room2 = Room.create(name: 'Omegacucks')
+room2 = Room.create(name: "Let's tilt")
 
 users = User.create([
     # {username: 'sona', email: 'sona@gmail.com', password: '123456', room: room },
