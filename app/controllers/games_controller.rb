@@ -29,13 +29,14 @@ class GamesController < ApplicationController
         end
 
         game.users.delete(@current_user)
+        @current_user.game_id = nil
 
         # i need to make sure they fold the hand they're in...
         @current_user.reset_user
         @current_user.save
         
         ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
-        render json: { success: "#{@current_user.username} has left the game."}, status: 201
+        render json: { success: "#{@current_user.username} has left the game.", user: @current_user }, status: 201
     end
 
     def start
