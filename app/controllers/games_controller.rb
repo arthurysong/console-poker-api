@@ -16,7 +16,7 @@ class GamesController < ApplicationController
         @current_user.save
 
         ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
-        render json: { success: "#{@current_user.username} has joined game."}, status: 201
+        render json: { success: "#{@current_user.username} has joined game.", user: @current_user }, status: 201
     end
 
     def leave_game

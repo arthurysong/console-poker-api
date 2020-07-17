@@ -27,7 +27,7 @@ class PaymentsController < ApplicationController
         end
 
         connected_account_id = response.stripe_user_id
-        user = current_user
+        user = @current_user
         save_account_id(connected_account_id, user)
 
         # Render some HTML or redirect to a different page.
@@ -40,9 +40,9 @@ class PaymentsController < ApplicationController
     end
     
     def secret
-        puts params[:amount]
+        # puts params[:amount]
         amount = params[:amount].delete(',').to_i
-        puts amount
+        # puts amount
         intent = Stripe::PaymentIntent.create({
             amount: amount,
             currency: 'usd',
@@ -54,9 +54,7 @@ class PaymentsController < ApplicationController
 
     def transfer_secret
         amount = params[:amount].delete(',').to_i
-        user = current_user
-        # puts amount
-        # puts user.username
+        user = @current_user
 
         chips = amount * 100
 

@@ -3,12 +3,6 @@ require 'pry'
 class AuthenticationController < ApplicationController
     skip_before_action :authenticate_request
 
-    # def google
-        # puts 'hello'
-        # render json: { message: "hi" }
-        # redirect_to '/auth/google_oauth2'
-    # end
-    
     def authenticate
         puts params
         if user_params[:site]
@@ -29,7 +23,6 @@ class AuthenticationController < ApplicationController
 
         # puts JsonWebToken.decode(command.result[:token])[:user_id][0]
     def set_login
-        # puts 'hello??'
         @current_user = AuthorizeApiRequest.call(request.headers).result
         if @current_user 
             render json: { user: @current_user }

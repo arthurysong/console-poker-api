@@ -24,10 +24,10 @@ class UsersController < ApplicationController
     end
 
     def make_move
-        game = current_user.game
+        game = @current_user.game
 
-        if current_user.round
-            current_user.make_move(params["command"], params["amount"])
+        if @current_user.round
+            @current_user.make_move(params["command"], params["amount"])
 
             ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
 
@@ -47,12 +47,12 @@ class UsersController < ApplicationController
     end
 
     def get_chips
-        chips = current_user.chips
+        chips = @current_user.chips
         render json: { chips: chips }, status: 200
     end
 
     def add_chips
-        user = current_user
+        user = @current_user
         user.chips += params[:amount]
         user.save
         render json: { chips: user.chips }, status: :accepted
