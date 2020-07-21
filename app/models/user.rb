@@ -10,6 +10,7 @@ class User < ApplicationRecord
     #playing
     #cards
     #dealer
+    #winnings
 
     def as_json(options = {})
         super(methods: [:connected, :possible_moves])

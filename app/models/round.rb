@@ -374,6 +374,7 @@ class Round < ApplicationRecord
         split = self.pot / best_players.count
         best_players.each do |player|
             player.chips += split
+            player.winnings = split
             player.save
         end
 
@@ -385,6 +386,7 @@ class Round < ApplicationRecord
     def end_game_by_fold
         last_player = self.active_players[0]
         last_player.chips += self.pot
+        last_player.winnings = self.pot
         last_player.save
 
         self.is_playing = false
