@@ -84,6 +84,7 @@ class Round < ApplicationRecord
             player.dealer = false
             player.round_id = self.id
             player.round_bet = 0
+            player.winnings = 0
             player.save
         end
 
