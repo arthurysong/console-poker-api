@@ -19,6 +19,7 @@ class User < ApplicationRecord
         self.cards = ""
         self.round_bet = 0
         self.dealer = false
+        self.winnings = 0
         self.save
     end
 
