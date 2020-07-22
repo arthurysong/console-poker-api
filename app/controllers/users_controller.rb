@@ -29,7 +29,8 @@ class UsersController < ApplicationController
         if @current_user.round
             @current_user.make_move(params["command"], params["amount"])
 
-            ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
+            # ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
+            ActionCable.server.broadcast("game_#{game.id}", { type: "new_move", command: params["command"], game: game })
 
             render json: { message: "Move Success." }
         else
@@ -42,8 +43,9 @@ class UsersController < ApplicationController
         game = user.game
 
         user.make_move("call")
-        ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
-        render json: { message: "Move Success." }
+        # ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
+            ActionCable.server.broadcast("game_#{game.id}", { type: "new_move", command: "call", game: game })
+            render json: { message: "Move Success." }
     end
 
     def get_chips
