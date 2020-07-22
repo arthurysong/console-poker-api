@@ -35,7 +35,11 @@ class Round < ApplicationRecord
     end
 
     def turn 
-        active_players[self.turn_index]
+        if self.is_playing 
+            active_players[self.turn_index]
+        else
+            nil
+        end
     end
 
     def turn= (user)
