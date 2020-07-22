@@ -42,9 +42,15 @@ class UsersController < ApplicationController
         user = User.find_by(username: "Marley")
         game = user.game
 
-        user.make_move("call")
+        if user.round.highest_bet_for_phase > user.round_bet
+            user.make_move("call")
+            command = "call"
+        else
+            user.make_move("check")
+            command = "check"
+        end
         # ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
-            ActionCable.server.broadcast("game_#{game.id}", { type: "new_move", command: "call", game: game })
+            ActionCable.server.broadcast("game_#{game.id}", { type: "new_move", command: command, game: game })
             render json: { message: "Move Success." }
     end
 
