@@ -27,10 +27,16 @@ class UsersController < ApplicationController
         game = @current_user.game
 
         if @current_user.round
+            turn_index = @current_user.round.turn_index
             @current_user.make_move(params["command"], params["amount"])
-
+            # @current_user.save
             # ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
-            ActionCable.server.broadcast("game_#{game.id}", { type: "new_move", command: params["command"], game: game })
+            # need to refresh the user here to return fresh user
+            # user = User.find(1)
+            # user = @current_user
+            user = current_user
+            
+            ActionCable.server.broadcast("game_#{game.id}", { type: "new_move", turn_index: turn_index, command: params["command"], moved_user: user, game: game })
 
             render json: { message: "Move Success." }
         else
@@ -41,6 +47,7 @@ class UsersController < ApplicationController
     def marley_call
         user = User.find_by(username: "Marley")
         game = user.game
+        turn_index = user.round.turn_index
 
         if user.round.highest_bet_for_phase > user.round_bet
             user.make_move("call")
@@ -49,8 +56,12 @@ class UsersController < ApplicationController
             user.make_move("check")
             command = "check"
         end
-        # ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
-            ActionCable.server.broadcast("game_#{game.id}", { type: "new_move", command: command, game: game })
+            user = User.find_by(username: "Marley")
+
+            ActionCable.server.broadcast("game_#{game.id}", { type: "new_move", turn_index: turn_index, command: command, moved_user: user, game: game })
+            # ActionCable.server.broadcast("game_#{game.id}", { type: "new_move", command: params["command"], moved_user: user, game: game })
+            # ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
+            # ActionCable.server.broadcast("game_#{game.id}", { type: "new_move", command: command, game: game })
             render json: { message: "Move Success." }
     end
 
