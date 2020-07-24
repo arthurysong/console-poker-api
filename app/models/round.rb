@@ -27,7 +27,7 @@ class Round < ApplicationRecord
     BIG_BLIND = 400
 
     def as_json(options = {})
-        super(only: [:id, :status, :pot, :highest_bet_for_phase, :is_playing, :phase, :result], methods: [:access_community_cards, :ordered_users, :turn])
+        super(only: [:id, :pot, :highest_bet_for_phase, :is_playing, :phase, :result], methods: [:access_community_cards, :ordered_users, :turn])
     end 
 
     def ordered_users
@@ -228,6 +228,10 @@ class Round < ApplicationRecord
     end
 
     def make_player_move(command, amount = 0, blinds = false)
+        #setting the turn info to broadcast to subscribers??
+        moved_user = turn
+        turn_index = self.turn_index
+
         if command == "fold"
             self.status << "#{turn.username} folds."
             folding_player = turn
@@ -304,12 +308,26 @@ class Round < ApplicationRecord
         elsif command == "allin"
             turn.make_move('raise', max_raise_level)
         end
-        
+
+        ActionCable.server.broadcast("game_#{self.game.id}", { 
+                type: "new_move", 
+                turn_index: turn_index, 
+                command: command, 
+                moved_user: moved_user, 
+                })
+
         if check_if_over
             end_game_by_fold
         elsif phase_finished?
             initiate_next_phase
         end
+
+        ActionCable.server.broadcast("game_#{game.id}", { 
+                type: "set_game", 
+                turn_index: turn_index, 
+                command: command, 
+                moved_user: moved_user, 
+                game: game })
     end
 
     def max_raise_level
