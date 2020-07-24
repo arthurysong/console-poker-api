@@ -51,7 +51,7 @@ class GamesController < ApplicationController
             game.start
             game = Game.find(params[:id])
 
-            ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
+            ActionCable.server.broadcast("game_#{game.id}", { type: "start_game", game: game })
             render json: { success: "New Round started" }
         else
             ActionCable.server.broadcast("game_#{game.id}", { type: "errors", error: "Round is still playing." })

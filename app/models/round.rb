@@ -312,9 +312,9 @@ class Round < ApplicationRecord
         ActionCable.server.broadcast("game_#{self.game.id}", { 
                 type: "new_move", 
                 turn_index: turn_index, 
-                command: command, 
+                # command: command, 
                 moved_user: moved_user, 
-                })
+                }) if !blinds 
 
         if check_if_over
             end_game_by_fold
@@ -323,11 +323,11 @@ class Round < ApplicationRecord
         end
 
         ActionCable.server.broadcast("game_#{game.id}", { 
-                type: "set_game", 
-                turn_index: turn_index, 
-                command: command, 
-                moved_user: moved_user, 
-                game: game })
+            type: "marleys_turn" }) if turn && turn.username == "Marley"
+
+        ActionCable.server.broadcast("game_#{game.id}", { 
+                type: "update_game_after_move", 
+                game: game }) if !blinds
     end
 
     def max_raise_level
