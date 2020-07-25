@@ -13,8 +13,12 @@ class User < ApplicationRecord
     #winnings
 
     def as_json(options = {})
-        super(methods: [:connected, :possible_moves])
+        super(methods: [:connected, :possible_moves, :current_hand])
     end 
+
+    def current_hand
+        PokerHand.new(self.cards + self.round.access_community_cards).rank.titleize
+    end
 
     def reset_user
         self.cards = ""
@@ -30,6 +34,7 @@ class User < ApplicationRecord
 
     def possible_moves
         moves = []
+        # puts self.round
         if !self.round || !self.playing
             moves
         elsif self.round && self.round.is_playing

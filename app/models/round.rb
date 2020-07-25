@@ -312,7 +312,7 @@ class Round < ApplicationRecord
         ActionCable.server.broadcast("game_#{self.game.id}", { 
                 type: "new_move", 
                 turn_index: turn_index, 
-                # command: command, 
+                command: command, 
                 moved_user: moved_user, 
                 }) if !blinds 
 
@@ -395,11 +395,18 @@ class Round < ApplicationRecord
         end
 
         split = self.pot / best_players.count
+        best_ids = {} # so we can return ids that won in a hash, for client to put sound
         best_players.each do |player|
+            best_ids[player.id] = true
             player.chips += split
             player.winnings = split
             player.save
         end
+
+        ActionCable.server.broadcast("game_#{self.game.id}", { 
+                type: "game_end_by_showdown",
+                winner_ids: best_ids 
+            })
 
         self.is_playing = false
         self.save
@@ -416,6 +423,11 @@ class Round < ApplicationRecord
         self.status << "\n#{last_player.username} wins #{self.pot}!"
         self.result << "\n#{last_player.username} wins #{self.pot}!"
         self.save
+
+        ActionCable.server.broadcast("game_#{self.game.id}", { 
+                type: "game_end_by_fold",
+                winner_ids: { [last_player.id] => true } 
+            }) 
     end
 
     def check_if_over
