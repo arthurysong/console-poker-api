@@ -17,7 +17,9 @@ class User < ApplicationRecord
     end 
 
     def current_hand
-        PokerHand.new(self.cards + self.round.access_community_cards).rank.titleize
+        rank = PokerHand.new(self.cards + self.round.access_community_cards).rank.titleize
+        rank = "High Card" if rank == "Highest Card"
+        rank
     end
 
     def reset_user
