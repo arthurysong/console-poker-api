@@ -109,7 +109,7 @@ class Round < ApplicationRecord
         self.status << "#{user.username} has left the game."
         self.save
         if self.turn == user
-            self.make_player_move('fold')
+            self.make_player_move('fold', nil, true)
         else
             
             user.playing = false
