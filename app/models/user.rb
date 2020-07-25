@@ -12,6 +12,8 @@ class User < ApplicationRecord
     #dealer
     #winnings
 
+    #checked
+
     def as_json(options = {})
         super(methods: [:connected, :possible_moves, :current_hand])
     end 
@@ -29,6 +31,7 @@ class User < ApplicationRecord
         self.round_bet = 0
         self.dealer = false
         self.winnings = 0
+        self.checked = false
         self.save
     end
 

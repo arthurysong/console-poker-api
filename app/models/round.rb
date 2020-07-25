@@ -89,6 +89,7 @@ class Round < ApplicationRecord
             player.round_id = self.id
             player.round_bet = 0
             player.winnings = 0
+            player.checked = false
             player.save
         end
 
@@ -196,6 +197,7 @@ class Round < ApplicationRecord
 
         self.active_players.each do |player| 
             player.round_bet = 0
+            player.checked = false
             player.save
         end 
 
@@ -254,6 +256,8 @@ class Round < ApplicationRecord
             # add check
             if self.highest_bet_for_phase == 0 || turn.round_bet == self.highest_bet_for_phase
                 self.status << "#{turn.username} checks"
+                turn.checked = true
+                turn.save
                 next_turn
             else
                 self.status << "Invalid move. Please try again."
