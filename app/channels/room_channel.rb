@@ -14,13 +14,13 @@ class RoomChannel < ApplicationCable::Channel
     ActionCable.server.broadcast("rooms", { type: "current_rooms", rooms: rooms }) 
   end
 
-  def create_message(data)
-    user = find_verified_user
-    room = user.room
-    m = Message.create(payload: data["content"], user: user, chatbox: room.chatbox)
+  # def create_message(data)
+  #   user = find_verified_user
+  #   room = user.room
+  #   m = Message.create(payload: data["content"], user: user, chatbox: room.chatbox)
     
-    ActionCable.server.broadcast("room_#{room.id}", {type: "new_message", message: m })
-  end
+  #   ActionCable.server.broadcast("room_#{room.id}", {type: "new_message", message: m })
+  # end
 
   def unsubscribed
     room = Room.find(params["room"])
