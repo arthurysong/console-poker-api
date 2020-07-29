@@ -1,8 +1,9 @@
 # Console-Poker
 
-Console-poker is a web application that allows users to chat and play poker real-time! Users can deposit funds into their accounts, join a room, and begin chatting/playing Texas Holdem. Once users are done playing poker, they can head to their bank and withdraw their available winnings.
+Console-poker is an online Poker application that supports real-time chatting and USD transactions! Users sign up, deposit funds, join a room, and play No-Limit Texas Holdem. Once you're done playing, head back to the bank to withdraw your winnings!
 
 This repository contains the Back End part of the stack (Rails API)!  
+
 For the Front End, see: https://github.com/atribecalledarty/console-poker-frontend  
 To see the fully Deployed Application, Visit: https://console-poker.herokuapp.com
 
