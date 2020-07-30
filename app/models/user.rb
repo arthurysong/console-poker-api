@@ -19,7 +19,7 @@ class User < ApplicationRecord
     end 
 
     def current_hand
-        if self.round.access_community_cards != "" 
+        if self.round && self.cards && self.round.access_community_cards != "" 
             rank = PokerHand.new(self.cards + self.round.access_community_cards).rank.titleize
             rank = "High Card" if rank == "Highest Card"
             rank
@@ -36,10 +36,9 @@ class User < ApplicationRecord
     end
 
     def set_playing(round_id)
-        reset_user
         self.playing = true
         self.round_id = round_id
-        self.save
+        reset_user
     end
 
     def connected
@@ -49,6 +48,7 @@ class User < ApplicationRecord
     def possible_moves
         moves = []
         # puts self.round
+        # binding.pry
         if !self.round || !self.playing
             moves
         elsif self.round && self.round.is_playing

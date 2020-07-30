@@ -81,7 +81,7 @@ class Round < ApplicationRecord
         # self.status << "ROUND STARTING"
         self.game.users.each {|p| p.set_playing(self.id) }
         self.is_playing = true
-        
+
         set_dealer
         set_cards
         start_betting_round
@@ -94,39 +94,8 @@ class Round < ApplicationRecord
         self.ordered_users[dealer_index].dealer = true
     end
 
-    def player_has_left(user_id)
-        user = self.ordered_users.detect {|u| u.id == user_id}
-        
-        self.status << "#{user.username} has left the game."
-        self.save
-        if self.turn == user
-            self.make_player_move('fold', nil, true)
-        else
-            
-            user.playing = false
-            user.round_bet = 0
-            user.cards = ""
-            user.save
-
-            self.no_players_for_phase -= 1
-
-            reset_turn_index 
-            self.turn_index += self.turn_count - 1
-            self.turn_index = self.turn_index % self.active_players.count
-
-            self.save
-
-            if check_if_over #check if game is over or next phase should happen.
-                # binding.pry
-                end_game_by_fold
-            end
-        end
-
-        if self.active_players.count == 0
-            self.status << "Everyone has left. Game ending."
-            self.is_playing = false
-            self.save
-        end
+    def player_has_left(user_id) # this will get reworked once i change the arrays around ...
+        #need to fix this once I add new seating arrangements..
     end
 
     def set_cards
@@ -139,22 +108,13 @@ class Round < ApplicationRecord
         end
 
         community_cards = []
-        5.times do 
-            c = deck.delete_at(Random.rand(deck.length))
-            community_cards << c
-        end
-
+        5.times { community_cards << deck.delete_at(Random.rand(deck.length)) }
         self.community_cards = community_cards.join(' ')
         self.save
 
         #deal cards to players
         self.active_players.each do |player|
-            cards = []
-            2.times do 
-                c = deck.delete_at(Random.rand(deck.length))
-                cards << c
-            end
-            player.cards = cards.join(' ')
+            player.cards = "#{deck.delete_at(Random.rand(deck.length))} #{deck.delete_at(Random.rand(deck.length))}"
             player.save
         end
     end
@@ -174,17 +134,6 @@ class Round < ApplicationRecord
     end
 
     def start_betting_round
-        case self.phase
-        when PRE_FLOP
-            self.status << "\nXXXXXXXXX Pre-flop XXXXXXXXX\n"
-        when FLOP
-            self.status << "\nXXXXXXXXX Flop XXXXXXXXX\n"
-        when TURN
-            self.status << "\nXXXXXXXXX Turn XXXXXXXXX\n"
-        when RIVER
-            self.status << "\nXXXXXXXXX River XXXXXXXXX\n"
-        end
-
         self.active_players.each do |player| 
             player.round_bet = 0
             player.checked = false
@@ -195,111 +144,68 @@ class Round < ApplicationRecord
         self.no_players_for_phase = active_players.count
         self.highest_bet_for_phase = 0
         self.turn_count = 1
-        self.save
 
         if self.phase == 0
-            self.status << "Collecting Blinds (200, 400)."
             self.turn.make_move('raise', SMALL_BLIND, true) # put in blinds for preflop round
             self.turn.make_move('raise', BIG_BLIND, true) # put in blinds for preflop round
         end
-            self.status << "\n#{turn.username}'s turn."
+
         self.save
     end
 
     def next_turn(blinds = false)
-        if self.turn_index < active_players.count-1
-            self.turn_index += 1
-        else
-            self.turn_index = 0
-        end
+        self.turn_index = (self.turn_index + 1) % (self.active_players.count)
 
-        unless blinds
-            self.status << "\n#{turn.username}'s turn." unless phase_finished?
-            self.turn_count += 1 unless blinds
-        end
+        self.turn_count += 1 unless blinds
     end
 
     def make_player_move(command, amount = 0, blinds = false)
         #setting the turn info to broadcast to subscribers??
         moved_user = turn
         turn_index = self.turn_index
-
-        if command == "fold"
-            self.status << "#{turn.username} folds."
+        case command
+        when 'fold'
             folding_player = turn
             folding_player.playing = false
             folding_player.save
 
-            if self.turn_index == self.active_players.count # if last person folds, i need to set index to first person
-                self.turn_index = 0
-            end
+            self.turn_index = self.turn_index % self.active_players.count
             
-            #what if last person is the small_blind_index and they fold?
-            # self.small_blind_index = self.small_blind_index % self.active_players.count
-            unless check_if_over
-                self.status << "#{turn.username}'s turn.\n"
-            end
-            # self.status << "#{turn.username}'s turn..." unless check_if_over
             self.turn_count += 1
             self.save
-        elsif command == "check"
-            # add check
+        when 'check'
             if self.highest_bet_for_phase == 0 || turn.round_bet == self.highest_bet_for_phase
-                self.status << "#{turn.username} checks"
                 turn.checked = true
                 turn.save
                 next_turn
-            else
-                self.status << "Invalid move. Please try again."
+                self.save
             end
-            self.save
-        elsif command == "call"
+        when 'call'
             if self.highest_bet_for_phase > turn.round_bet || self.highest_bet_for_phase == 0
-                self.status << "#{turn.username} calls."
                 money_to_leave_player = self.highest_bet_for_phase - turn.round_bet
                 turn.round_bet = self.highest_bet_for_phase
                 turn.chips -= money_to_leave_player
-                if turn.chips == 0
-                    self.all_in = true
-                    self.status << "#{turn.username} is all in."
-                end
+                self.all_in = true if turn.chips == 0
 
                 self.pot += money_to_leave_player
                 turn.save
 
-                #increment turn index
                 next_turn
-            else
-                self.status << "Invalid move. Please try again."
+                self.save
             end
-            self.save
-        elsif command == "raise"
+        when 'raise'
             if can_players_afford?(amount) && amount > self.highest_bet_for_phase
-                if blinds 
-                    self.status << "#{turn.username}: #{amount}"
-                else
-                    self.status << "#{turn.username} raises to #{amount}."
-                end
-              
-                turn.username
                 money_to_leave_player = amount - turn.round_bet
                 turn.round_bet = amount
                 turn.chips -= money_to_leave_player
                 turn.save
-
-                if turn.chips == 0
-                    self.all_in = true 
-                    self.status << "#{turn.username} is all in."
-                end
-                # binding.pry
+                self.all_in = true if turn.chips == 0
                 self.pot += money_to_leave_player
                 self.highest_bet_for_phase = amount
                 next_turn(blinds)
-            else
-                self.status << "Invalid raise amount. Please make sure all players can afford raise amount."
+                self.save
             end
-            self.save
-        elsif command == "allin"
+        when 'allin'
             turn.make_move('raise', max_raise_level)
         end
 
@@ -370,24 +276,6 @@ class Round < ApplicationRecord
             end
         end
         
-        self.status << " "
-        if best_players.count == 1
-            self.status << "#{best_players[0].username} has the best hand with #{best_hands[0]}"
-            self.status << "#{best_players[0].username} wins #{self.pot}!"
-            # self.result << "#{best_players[0].username} has the best hand with #{best_hands[0]}"
-            # self.result << "#{best_players[0].username} wins #{self.pot}!"
-            self.result << "#{best_players[0].username} wins #{self.pot} with #{best_hands[0].rank}"
-        else
-            string = "Tie!"
-            best_players.each_with_index do |player, index|
-                string += "\n#{player.username} has #{best_hands[index].rank}"
-                
-            end
-            self.status << string
-            self.status << "#{self.pot} is split between the winners."
-            self.result << "#{self.pot} is split between the winners."
-        end
-
         split = self.pot / best_players.count
         best_ids = {} # so we can return ids that won in a hash, for client to put sound
         best_players.each do |player|
@@ -414,9 +302,6 @@ class Round < ApplicationRecord
         last_player.save
 
         self.is_playing = false
-        self.status << "\n#{last_player.username} wins #{self.pot}!"
-        self.result << "\n#{last_player.username} wins #{self.pot}!"
-        self.save
 
         ActionCable.server.broadcast("game_#{self.game.id}", { 
                 type: "game_end_by_fold",
