@@ -35,11 +35,8 @@ class Round < ApplicationRecord
     end
 
     def turn 
-        if self.is_playing 
-            active_players[self.turn_index]
-        else
-            nil
-        end
+        return active_players[self.turn_index] if self.is_playing
+        nil
     end
 
     def turn= (user)
@@ -57,11 +54,12 @@ class Round < ApplicationRecord
     end
 
     def access_community_cards
-        if self.phase == PRE_FLOP
+        case self.phase
+        when PRE_FLOP
             return ""
-        elsif self.phase == FLOP
+        when FLOP
             return self.community_cards[0..7]
-        elsif self.phase == TURN
+        when TURN
             return self.community_cards[0..10]
         else
             return self.community_cards
@@ -74,34 +72,26 @@ class Round < ApplicationRecord
 
     def players_have_bet?
         self.active_players.each do |player|
-            if player.round_bet < self.highest_bet_for_phase
-                return false
-            end
+            return false if player.round_bet < self.highest_bet_for_phase
         end
         true
     end
 
     def start
-        self.status << "ROUND STARTING"
-        self.game.users.each do |player| 
-            player.playing = true 
-            player.dealer = false
-            player.round_id = self.id
-            player.round_bet = 0
-            player.winnings = 0
-            player.checked = false
-            player.save
-        end
-
-        dealer_index = self.small_blind_index - 1
-        dealer_index = dealer_index % self.users.length
-        self.ordered_users[dealer_index].dealer = true
-        
+        # self.status << "ROUND STARTING"
+        self.game.users.each {|p| p.set_playing(self.id) }
         self.is_playing = true
-        self.save
-
+        
+        set_dealer
         set_cards
         start_betting_round
+
+        self.save
+    end
+
+    def set_dealer
+        dealer_index = (self.small_blind_index - 1) % self.users.length
+        self.ordered_users[dealer_index].dealer = true
     end
 
     def player_has_left(user_id)

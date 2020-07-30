@@ -15,7 +15,7 @@ class GamesController < ApplicationController
         game.users << @current_user
         @current_user.save
 
-        ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
+        ActionCable.server.broadcast("game_#{game.id}", { type: "user_join", game: game })
         render json: { success: "#{@current_user.username} has joined game.", user: @current_user }, status: 201
     end
 
@@ -35,7 +35,7 @@ class GamesController < ApplicationController
         @current_user.reset_user
         @current_user.save
         
-        ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
+        ActionCable.server.broadcast("game_#{game.id}", { type: "user_leave", game: game })
         render json: { success: "#{@current_user.username} has left the game.", user: @current_user }, status: 201
     end
 

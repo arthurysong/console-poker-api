@@ -66,16 +66,6 @@ class UsersController < ApplicationController
             user = User.find_by(username: "Marley")
             game = user.game
 
-            # binding.pry
-            # ActionCable.server.broadcast("game_#{game.id}", { 
-            #     type: "new_move", 
-            #     turn_index: turn_index, 
-            #     command: command, 
-            #     moved_user: user, 
-            #     game: game })
-            # ActionCable.server.broadcast("game_#{game.id}", { type: "new_move", command: params["command"], moved_user: user, game: game })
-            # ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
-            # ActionCable.server.broadcast("game_#{game.id}", { type: "new_move", command: command, game: game })
             render json: { message: "Move Success." }
     end
 

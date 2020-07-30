@@ -35,6 +35,13 @@ class User < ApplicationRecord
         self.save
     end
 
+    def set_playing(round_id)
+        reset_user
+        self.playing = true
+        self.round_id = round_id
+        self.save
+    end
+
     def connected
         self.connect_account_id == nil ? false : true
     end
