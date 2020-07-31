@@ -28,13 +28,12 @@ class Round < ApplicationRecord
     BIG_BLIND = 400
 
     def as_json(options = {})
-        super(only: [:id, :pot, :highest_bet_for_phase, :is_playing, :phase, :result], methods: [:access_community_cards, :ordered_users, :turn])
+        super(only: [:id, :pot, :highest_bet_for_phase, :is_playing, :phase, :result], methods: [:access_community_cards, :turn])
     end 
 
-    def ordered_users
-        
+    # def ordered_users
     #     self.users.sort{|a,b| a.id <=> b.id}
-    end
+    # end
 
     def turn 
         return User.find(self.seats[self.turn_index]) if self.is_playing
@@ -110,8 +109,20 @@ class Round < ApplicationRecord
         # self.ordered_users[dealer_index].dealer = true
     end
 
-    def player_has_left(user_id) # this will get reworked once i change the arrays around ...
-        #need to fix this once I add new seating arrangements..
+    def player_has_left(user) # this will get reworked once i change the arrays around ...
+        # need to fix this once I add new seating arrangements..
+        next_turn if turn == user
+
+        self.seats.each_with_index do |s,i|
+            if user.id == s
+                self.seats[i] = nil
+                self.users.delete(user)
+                self.save
+                break
+            end
+        end
+
+        end_game_by_fold if check_if_over
     end
 
     def set_cards
@@ -140,17 +151,11 @@ class Round < ApplicationRecord
         #this is responsible for finding first person to go in each round.
         i = self.small_blind_index
         while true 
-            # i = i % 8
             if self.seats[i] && User.find(self.seats[i]).playing
                 self.turn = User.find(self.seats[i])
                 break
             end
-            # if self.ordered_users[i].playing
-                # self.turn = self.ordered_users[i] #turn= will use user to set turn_index
-                # break
-            # end
             i = (i + 1) % 8
-            # i += 1
         end
         self.save
     end
@@ -190,7 +195,7 @@ class Round < ApplicationRecord
 
     def next_turn(blinds = false)
         self.turn_index = (self.turn_index + 1) % 8
-        while self.seats[self.turn_index] == nil
+        while self.seats[self.turn_index] == nil || !User.find(self.seats[self.turn_index]).playing
             self.turn_index = (self.turn_index + 1) % 8
         end
         # self.turn_index = (self.turn_index + 1) % (self.active_players.count)
@@ -200,18 +205,21 @@ class Round < ApplicationRecord
 
     def make_player_move(command, amount = 0, blinds = false)
         #setting the turn info to broadcast to subscribers??
+        # r = Round.find(self.id)
         u = turn
         turn_index = self.turn_index
+        # binding.pry
         case command
+        
         when 'fold'
-            
+            # binding.pry
             u.playing = false
             u.save
 
             next_turn
-            # self.turn_index = self.turn_index % self.active_players.count
+            # r.turn_index = r.turn_index % r.active_players.count
             
-            # self.turn_count += 1
+            # r.turn_count += 1
             self.save
         when 'check'
             if self.highest_bet_for_phase == 0 || turn.round_bet == self.highest_bet_for_phase
@@ -268,12 +276,17 @@ class Round < ApplicationRecord
             initiate_next_phase
         end
 
-        ActionCable.server.broadcast("game_#{game.id}", { 
-            type: "marleys_turn" }) if turn && turn.username == "Marley"
-
+        # binding.pry
         ActionCable.server.broadcast("game_#{game.id}", { 
                 type: "update_game_after_move", 
                 game: game }) if !blinds
+        
+        u = turn
+        if u && u.username == "Marley"
+            sleep 1.5
+            # binding.pry
+            u.call_or_check
+        end
     end
 
     def max_raise_level # these two should be computated in the beginning of the phase?
@@ -351,6 +364,7 @@ class Round < ApplicationRecord
         last_player.save
 
         self.is_playing = false
+        self.save
 
         ActionCable.server.broadcast("game_#{self.game.id}", { 
                 type: "game_end_by_fold",

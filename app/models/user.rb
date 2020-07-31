@@ -35,6 +35,16 @@ class User < ApplicationRecord
         self.save
     end
 
+    def call_or_check
+        if self.round.highest_bet_for_phase > self.round_bet
+            self.make_move("call")
+            command = "call"
+        else
+            self.make_move("check")
+            command = "check"
+        end
+    end
+
     def set_playing(round_id)
         self.playing = true
         self.round_id = round_id

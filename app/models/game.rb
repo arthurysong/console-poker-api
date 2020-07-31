@@ -63,6 +63,7 @@ class Game < ApplicationRecord
         end
 
         self.rounds.build(small_blind_index: new_index).tap do |new_round|
+        # self.rounds.build(small_blind_index: 0).tap do |new_round|
             new_round.save
             new_round.start
         end

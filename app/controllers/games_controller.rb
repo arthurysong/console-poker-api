@@ -24,11 +24,14 @@ class GamesController < ApplicationController
     def leave_game
         game = Game.find(params[:id])
 
-        if @current_user.round #if @current_user is in a round
-            if @current_user.round.is_playing #if @current_user is in a round and is playing..
-              @current_user.leave_round
-            end
+        if @current_user.round && @current_user.round.is_playing
+            @current_user.round.player_has_left(@current_user)
         end
+        # if @current_user.round #if @current_user is in a round
+            # if @current_user.round.is_playing #if @current_user is in a round and is playing..
+            #   @current_user.leave_round
+            # end
+        # end
         game.unsit(@current_user)
         # game.users.delete(@current_user)
         @current_user.game_id = nil

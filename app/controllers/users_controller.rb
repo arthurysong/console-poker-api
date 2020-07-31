@@ -55,18 +55,11 @@ class UsersController < ApplicationController
         user = User.find_by(username: "Marley")
         turn_index = user.round.turn_index
         # binding.pry
+        user.call_or_check
+        user = User.find_by(username: "Marley")
+        game = user.game
 
-        if user.round.highest_bet_for_phase > user.round_bet
-            user.make_move("call")
-            command = "call"
-        else
-            user.make_move("check")
-            command = "check"
-        end
-            user = User.find_by(username: "Marley")
-            game = user.game
-
-            render json: { message: "Move Success." }
+        render json: { message: "Move Success." }
     end
 
     def get_chips
