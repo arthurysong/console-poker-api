@@ -200,11 +200,11 @@ class Round < ApplicationRecord
 
     def make_player_move(command, amount = 0, blinds = false)
         #setting the turn info to broadcast to subscribers??
-        moved_user = turn
+        u = turn
         turn_index = self.turn_index
         case command
         when 'fold'
-            u = turn
+            
             u.playing = false
             u.save
 
@@ -215,7 +215,7 @@ class Round < ApplicationRecord
             self.save
         when 'check'
             if self.highest_bet_for_phase == 0 || turn.round_bet == self.highest_bet_for_phase
-                u = turn
+                
                 u.checked = true
                 u.save
                 next_turn
@@ -223,7 +223,7 @@ class Round < ApplicationRecord
             end
         when 'call'
             if self.highest_bet_for_phase > turn.round_bet || self.highest_bet_for_phase == 0
-                u = turn
+                
                 money_to_leave_player = self.highest_bet_for_phase - u.round_bet
                 u.round_bet = self.highest_bet_for_phase
                 u.chips -= money_to_leave_player
@@ -240,7 +240,7 @@ class Round < ApplicationRecord
             if can_players_afford?(amount) && amount > self.highest_bet_for_phase
                 # binding.pry
                 # binding.pry
-                u = turn
+                
                 money_to_leave_player = amount - u.round_bet
                 u.round_bet = amount
                 u.chips -= money_to_leave_player
