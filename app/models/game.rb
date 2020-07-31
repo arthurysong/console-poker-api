@@ -3,14 +3,13 @@ class Game < ApplicationRecord
     has_many :users
     has_many :rounds
 
-    #game should have seats
-    #then when round starts it copies from the seats..
     #seats 
+    #big_blind
 
     BIG_BLIND = 400
 
     def as_json(options = {})
-        super(only: [:id, :seats], methods: [:active_round, :seats_as_users, :startable], include: [:users])
+        super(only: [:id, :seats, :big_blind], methods: [:active_round, :seats_as_users, :startable], include: [:users])
         # super(only: [:id])
     end 
 
@@ -62,7 +61,7 @@ class Game < ApplicationRecord
             new_index = (last_blind_index + 1) % self.users.count
         end
 
-        self.rounds.build(small_blind_index: new_index).tap do |new_round|
+        self.rounds.build(small_blind_index: new_index, big_blind: self.big_blind).tap do |new_round|
         # self.rounds.build(small_blind_index: 0).tap do |new_round|
             new_round.save
             new_round.start

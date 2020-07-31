@@ -18,17 +18,18 @@ class Round < ApplicationRecord
     #seats
     #status (removed)
     #result
+    #big_blind
 
     PRE_FLOP = 0
     FLOP = 1
     TURN = 2
     RIVER = 3
 
-    SMALL_BLIND = 200
-    BIG_BLIND = 400
+    # SMALL_BLIND = 200
+    # BIG_BLIND = 400
 
     def as_json(options = {})
-        super(only: [:id, :pot, :highest_bet_for_phase, :is_playing, :phase, :result], methods: [:access_community_cards, :turn])
+        super(only: [:id, :pot, :highest_bet_for_phase, :is_playing, :phase, :result, :big_blind], methods: [:access_community_cards, :turn])
     end 
 
     # def ordered_users
@@ -180,10 +181,10 @@ class Round < ApplicationRecord
         self.save # need this to because in next block, for some reason I need to query DB for refreshed round
 
         if self.phase == 0
-            self.turn.make_move('raise', SMALL_BLIND, true) # put in blinds for preflop round
+            self.turn.make_move('raise', self.big_blind/2, true) # put in blinds for preflop round
             r = Round.find(self.id) # i'm not sure why the self won't persit i have to grab again.
 
-            r.turn.make_move('raise', BIG_BLIND, true) # put in blinds for preflop round
+            r.turn.make_move('raise', self.big_blind, true) # put in blinds for preflop round
         end
 
         self.save
