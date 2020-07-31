@@ -3,19 +3,52 @@ class Game < ApplicationRecord
     has_many :users
     has_many :rounds
 
+    #game should have seats
+    #then when round starts it copies from the seats..
+    #seats 
+
     BIG_BLIND = 400
 
     def as_json(options = {})
-        super(only: [:id], methods: [:active_round, :ordered_users, :startable], include: [:users])
+        super(only: [:id, :seats], methods: [:active_round, :seats_as_users, :startable], include: [:users])
         # super(only: [:id])
     end 
+
+    def sit(index, u)
+        if !index
+            self.seats.each_with_index do |s,i|
+                if s == nil
+                    index = i
+                    break
+                end
+            end
+        end
+        if !self.seats[index]
+            self.users << u
+            self.seats[index] = u.id
+            self.save
+        end #if index == nil, find first seat avail
+    end
+
+    def unsit(u)
+        index = nil
+        self.seats.each_with_index do |s,i|
+            index = i if u.id == s
+        end
+        self.seats[index] = nil
+        self.users.delete(u)
+        self.save
+    end
 
     def self.BIG_BLIND
         BIG_BLIND
     end
 
-    def ordered_users
-        self.users.sort{|a,b| a.id <=> b.id}
+    # def ordered_users
+    #     self.users.sort{|a,b| a.id <=> b.id}
+    # end
+    def seats_as_users
+        self.seats.map{|id| User.find(id) if id}
     end
     
     def active_round

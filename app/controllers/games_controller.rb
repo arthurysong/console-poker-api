@@ -10,9 +10,11 @@ class GamesController < ApplicationController
         end
     end
 
-    def join_game
+    def join_game(seat_index = nil)
+
         game = Game.find(params[:id])
-        game.users << @current_user
+        game.sit(seat_index, @current_user)
+            #find first seat available
         @current_user.save
 
         ActionCable.server.broadcast("game_#{game.id}", { type: "user_join", game: game })
@@ -27,8 +29,8 @@ class GamesController < ApplicationController
               @current_user.leave_round
             end
         end
-
-        game.users.delete(@current_user)
+        game.unsit(@current_user)
+        # game.users.delete(@current_user)
         @current_user.game_id = nil
 
         # i need to make sure they fold the hand they're in...

@@ -23,7 +23,8 @@ class GameChannel < ApplicationCable::Channel
       end
     end
     
-    game.users.delete(user)
+    game.unsit(user)
+    # game.users.delete(user)
     user.save
 
 
