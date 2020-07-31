@@ -34,7 +34,7 @@ class Game < ApplicationRecord
         self.seats.each_with_index do |s,i|
             index = i if u.id == s
         end
-        self.seats[index] = nil
+        self.seats[index] = nil if index # if user was not found...
         self.users.delete(u)
         self.save
     end
