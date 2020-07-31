@@ -172,16 +172,12 @@ class Round < ApplicationRecord
             player.checked = false
             player.save
         end
-        # self.active_players.each do |player| 
-        #     player.round_bet = 0
-        #     player.checked = false
-        #     player.save
-        # end 
 
         reset_turn_index
         self.no_players_for_phase = active_player_ids.count
         self.highest_bet_for_phase = 0
         self.turn_count = 1
+        self.save # need this to because in next block, for some reason I need to query DB for refreshed round
 
         if self.phase == 0
             self.turn.make_move('raise', SMALL_BLIND, true) # put in blinds for preflop round
@@ -205,25 +201,17 @@ class Round < ApplicationRecord
 
     def make_player_move(command, amount = 0, blinds = false)
         #setting the turn info to broadcast to subscribers??
-        # r = Round.find(self.id)
         u = turn
         turn_index = self.turn_index
-        # binding.pry
         case command
-        
         when 'fold'
-            # binding.pry
             u.playing = false
             u.save
 
             next_turn
-            # r.turn_index = r.turn_index % r.active_players.count
-            
-            # r.turn_count += 1
             self.save
         when 'check'
             if self.highest_bet_for_phase == 0 || turn.round_bet == self.highest_bet_for_phase
-                
                 u.checked = true
                 u.save
                 next_turn
@@ -231,7 +219,6 @@ class Round < ApplicationRecord
             end
         when 'call'
             if self.highest_bet_for_phase > turn.round_bet || self.highest_bet_for_phase == 0
-                
                 money_to_leave_player = self.highest_bet_for_phase - u.round_bet
                 u.round_bet = self.highest_bet_for_phase
                 u.chips -= money_to_leave_player
@@ -244,11 +231,7 @@ class Round < ApplicationRecord
                 self.save
             end
         when 'raise'
-            # binding.pry
             if can_players_afford?(amount) && amount > self.highest_bet_for_phase
-                # binding.pry
-                # binding.pry
-                
                 money_to_leave_player = amount - u.round_bet
                 u.round_bet = amount
                 u.chips -= money_to_leave_player
@@ -276,15 +259,13 @@ class Round < ApplicationRecord
             initiate_next_phase
         end
 
-        # binding.pry
         ActionCable.server.broadcast("game_#{game.id}", { 
                 type: "update_game_after_move", 
                 game: game }) if !blinds
         
         u = turn
-        if u && u.username == "Marley"
+        if u && u.username == "Marley" && !blinds
             sleep 1.5
-            # binding.pry
             u.call_or_check
         end
     end

@@ -57,6 +57,14 @@ class GamesController < ApplicationController
             game = Game.find(params[:id])
 
             ActionCable.server.broadcast("game_#{game.id}", { type: "start_game", game: game })
+
+            r = game.active_round # put in move for marley, because Marley only responds to moves that are !blind
+            u = r.turn
+            if u && u.username == "Marley"
+                # binding.pry
+                sleep 1.5
+                u.call_or_check
+            end
             render json: { success: "New Round started" }
         else
             ActionCable.server.broadcast("game_#{game.id}", { type: "errors", error: "Round is still playing." })
