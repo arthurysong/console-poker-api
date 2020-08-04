@@ -44,7 +44,7 @@ messages = Message.create([
 ])
 
 game = Game.create(room_id: room.id)
-game.users << marley
+game.sit(nil, marley)
 marley.save
 
 game2 = Game.create(room_id: room2.id)
