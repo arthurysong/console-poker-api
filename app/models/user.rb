@@ -18,7 +18,7 @@ class User < ApplicationRecord
         super(methods: [:connected, :possible_moves, :current_hand])
     end 
 
-    def current_hand
+    def current_hand # Formatting the rank method for PokerHand
         if self.round && self.cards && self.round.access_community_cards != "" 
             rank = PokerHand.new(self.cards + self.round.access_community_cards).rank.titleize
             rank = "High Card" if rank == "Highest Card"
@@ -36,13 +36,7 @@ class User < ApplicationRecord
     end
 
     def call_or_check
-        if self.round.highest_bet_for_phase > self.round_bet
-            self.make_move("call")
-            command = "call"
-        else
-            self.make_move("check")
-            command = "check"
-        end
+        self.round.highest_bet_for_phase > self.round_bet ? self.make_move("call") : self.make_move("check")
     end
 
     def set_playing(round_id)
@@ -55,27 +49,16 @@ class User < ApplicationRecord
         self.connect_account_id == nil ? false : true
     end
 
-    def possible_moves
+    def possible_moves # What moves does a user have, so client can render move buttons
+        return nil if !self.round || !self.playing
+
         moves = []
-        # puts self.round
-        # binding.pry
-        if !self.round || !self.playing
+        if self.round.turn == self
+            moves << "Fold"
+            moves << "Raise"
+            moves << (self.round_bet < self.round.highest_bet_for_phase ? "Call" : "Check") # User's round bet will only be less than or equal to
+            moves << "All In"
             moves
-        elsif self.round && self.round.is_playing
-            if self.round.turn != self
-                moves
-            else
-                #what moves do i have?
-                moves << "Fold"
-                moves << "Raise"
-                if self.round_bet == self.round.highest_bet_for_phase
-                    moves << "Check"
-                elsif self.round_bet < self.round.highest_bet_for_phase
-                    moves << "Call"
-                end
-                moves << "All In"
-                moves
-            end
         end
     end
 
@@ -92,9 +75,7 @@ class User < ApplicationRecord
     end
 
     def make_move(move, amount = 0, blinds = false)
-        if is_move_valid?
-            self.round.make_player_move(move, amount, blinds)
-        end
+        self.round.make_player_move(move, amount, blinds) if is_move_valid?
     end
 
     def leave_round

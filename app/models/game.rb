@@ -11,7 +11,7 @@ class Game < ApplicationRecord
     end 
 
     def sit(index, u)
-        index = self.seats.find_index(nil) if !index #find first seat avail
+        index = self.seats.find_index(nil) if !index # Find first seat avail if no index provided
         if !self.seats[index]
             self.users << u
             self.seats[index] = u.id
