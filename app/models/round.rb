@@ -25,9 +25,6 @@ class Round < ApplicationRecord
     TURN = 2
     RIVER = 3
 
-    # SMALL_BLIND = 200
-    # BIG_BLIND = 400
-
     def as_json(options = {})
         super(only: [:id, :pot, :highest_bet_for_phase, :is_playing, :phase, :result, :big_blind], methods: [:access_community_cards, :turn])
     end 
@@ -117,7 +114,6 @@ class Round < ApplicationRecord
         self.community_cards = community_cards.join(' ')
         self.save
 
-        #deal cards to players
         self.active_player_ids.each do |id|
             player = User.find(id)
             player.cards = "#{deck.delete_at(Random.rand(deck.length))} #{deck.delete_at(Random.rand(deck.length))}"
@@ -125,8 +121,7 @@ class Round < ApplicationRecord
         end
     end
 
-    def reset_turn_index
-        #this is responsible for finding first person to go in each round.
+    def reset_turn_index # Responsible for finding first person to go in each round.
         i = self.small_blind_index
         while true 
             if self.seats[i] && User.find(self.seats[i]).playing
@@ -141,7 +136,7 @@ class Round < ApplicationRecord
     
 
     def start_betting_round
-        self.seats.each do |p|
+        self.seats.each do |p| #Reset each player's round_bet and checked
             next if p == nil
             player = User.find(p)
             player.round_bet = 0
@@ -155,11 +150,11 @@ class Round < ApplicationRecord
         self.turn_count = 1
         self.save # need this to because in next block, for some reason I need to query DB for refreshed round
 
-        if self.phase == 0
-            self.turn.make_move('raise', self.big_blind/2, true) # put in blinds for preflop round
+        if self.phase == 0 # Put in blinds
+            self.turn.make_move('raise', self.big_blind/2, true) 
             r = Round.find(self.id) # i'm not sure why the self won't persit i have to grab again.
 
-            r.turn.make_move('raise', self.big_blind, true) # put in blinds for preflop round
+            r.turn.make_move('raise', self.big_blind, true) 
         end
 
         self.save
@@ -170,15 +165,15 @@ class Round < ApplicationRecord
         while self.seats[self.turn_index] == nil || !User.find(self.seats[self.turn_index]).playing
             self.turn_index = (self.turn_index + 1) % 8
         end
-        # self.turn_index = (self.turn_index + 1) % (self.active_players.count)
 
         self.turn_count += 1 unless blinds
     end
 
     def make_player_move(command, amount = 0, blinds = false)
-        #setting the turn info to broadcast to subscribers??
-        u = turn
+        # These variables I need when I broadcast to ActionCable
+        u = turn 
         turn_index = self.turn_index
+        
         case command
         when 'fold'
             u.playing = false
@@ -257,20 +252,15 @@ class Round < ApplicationRecord
     end
 
     def can_players_afford?(amount) # this should be in the beginning of the phase?
-        self.active_player_ids.each do |id, index|
+        self.active_player_ids.each do |id|
             player = User.find(id)
-            money_to_leave_player = amount - player.round_bet
-            if player.chips < money_to_leave_player
-                return false
-            end
+            return false if player.chips < amount - player.round_bet
         end
-        true
     end
 
     def initiate_next_phase
-        # or if all in, just go to showdown
-        if all_in || self.phase == 3 
-            self.phase = 3
+        if all_in || self.phase == RIVER #If someone is all in or phase RIVER go to showdown
+            self.phase = RIVER
             self.save
             showdown
         else
@@ -282,7 +272,7 @@ class Round < ApplicationRecord
     def showdown
         best_hands = []
         best_players = []
-        # phase = 3
+
         active_player_ids.each_with_index do |id, index|
             player = User.find(id)
             hand = PokerHand.new(player.cards + " " + self.community_cards)
