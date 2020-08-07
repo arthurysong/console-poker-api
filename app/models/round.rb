@@ -54,6 +54,10 @@ class Round < ApplicationRecord
         end
     end
 
+    def active_player_ids
+        self.seats.select{|i| i != nil && User.find(i).playing }
+    end
+
     def phase_finished?
         players_have_bet? && self.turn_count > self.no_players_for_phase
     end
@@ -80,33 +84,21 @@ class Round < ApplicationRecord
     end
 
     def set_dealer
-        # binding.pry
-        dealer_index = (self.small_blind_index - 1) % 8
-        # puts dealer_index
-        while self.seats[dealer_index] == nil
+        while self.seats[dealer_index] == nil || dealer_index != self.small_blind_index
             dealer_index = (dealer_index - 1) % 8
         end
-        # binding.pry
+
         u = User.find(self.seats[dealer_index])
         u.dealer = true
         u.save
-        # binding.pry
-        # dealer_index = (self.small_blind_index - 1) % self.users.length
-        # self.ordered_users[dealer_index].dealer = true
     end
 
     def player_has_left(user) # this will get reworked once i change the arrays around ...
-        # need to fix this once I add new seating arrangements..
         next_turn if turn == user
 
-        self.seats.each_with_index do |s,i|
-            if user.id == s
-                self.seats[i] = nil
-                self.users.delete(user)
-                self.save
-                break
-            end
-        end
+        self.seats[self.seats.find_index(user.id)] = nil
+        self.users.delete(user)
+        self.save
 
         end_game_by_fold if check_if_over
     end
@@ -146,9 +138,7 @@ class Round < ApplicationRecord
         self.save
     end
 
-    def active_player_ids
-        self.seats.select{|i| i != nil && User.find(i).playing }
-    end
+    
 
     def start_betting_round
         self.seats.each do |p|
