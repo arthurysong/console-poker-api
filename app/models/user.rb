@@ -11,7 +11,6 @@ class User < ApplicationRecord
     #cards
     #dealer
     #winnings
-
     #checked
 
     def as_json(options = {})
