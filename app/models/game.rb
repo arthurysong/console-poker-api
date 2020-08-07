@@ -10,18 +10,10 @@ class Game < ApplicationRecord
 
     def as_json(options = {})
         super(only: [:id, :seats, :big_blind], methods: [:active_round, :seats_as_users, :startable], include: [:users])
-        # super(only: [:id])
     end 
 
     def sit(index, u)
-        if !index
-            self.seats.each_with_index do |s,i|
-                if s == nil
-                    index = i
-                    break
-                end
-            end
-        end
+        index = self.seats.find_index(nil) if !index
         if !self.seats[index]
             self.users << u
             self.seats[index] = u.id
@@ -31,10 +23,8 @@ class Game < ApplicationRecord
 
     def unsit(u)
         index = nil
-        self.seats.each_with_index do |s,i|
-            index = i if u.id == s
-        end
-        self.seats[index] = nil if index # if user was not found...
+        index = self.seats.find_index(u.id)
+        self.seats[index] = nil if index # if user was found
         self.users.delete(u)
         self.save
     end
@@ -43,9 +33,6 @@ class Game < ApplicationRecord
         BIG_BLIND
     end
 
-    # def ordered_users
-    #     self.users.sort{|a,b| a.id <=> b.id}
-    # end
     def seats_as_users
         self.seats.map{|id| User.find(id) if id}
     end
