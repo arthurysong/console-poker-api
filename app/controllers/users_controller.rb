@@ -27,24 +27,9 @@ class UsersController < ApplicationController
         game = @current_user.game
 
         if @current_user.round
-            #make sure move is valid??
-
             turn_index = @current_user.round.turn_index
             @current_user.make_move(params["command"], params["amount"])
-
-            #need to refresh the user since it's still pointing to old user...
-            user = User.find(current_user.id)
             
-            # binding.pry
-            # ActionCable.server.broadcast("game_#{game.id}", 
-            #     { 
-            #     type: "new_move", 
-            #     turn_index: turn_index, 
-            #     command: params["command"], 
-            #     moved_user: user, 
-            #     game: game 
-            # })
-
             render json: { message: "Move Success." }
         else
             render json: { error: "User is not in current round."}
@@ -53,11 +38,7 @@ class UsersController < ApplicationController
 
     def marley_call
         user = User.find_by(username: "Marley")
-        turn_index = user.round.turn_index
-        # binding.pry
         user.call_or_check
-        user = User.find_by(username: "Marley")
-        game = user.game
 
         render json: { message: "Move Success." }
     end
