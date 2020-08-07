@@ -27,7 +27,6 @@ class UsersController < ApplicationController
         game = @current_user.game
 
         if @current_user.round
-            turn_index = @current_user.round.turn_index
             @current_user.make_move(params["command"], params["amount"])
             
             render json: { message: "Move Success." }
