@@ -40,9 +40,7 @@ class PaymentsController < ApplicationController
     end
     
     def secret
-        # puts params[:amount]
         amount = params[:amount].delete(',').to_i
-        # puts amount
         intent = Stripe::PaymentIntent.create({
             amount: amount,
             currency: 'usd',
