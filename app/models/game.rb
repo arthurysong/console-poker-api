@@ -6,19 +6,17 @@ class Game < ApplicationRecord
     #seats 
     #big_blind
 
-    BIG_BLIND = 400
-
     def as_json(options = {})
         super(only: [:id, :seats, :big_blind], methods: [:active_round, :seats_as_users, :startable], include: [:users])
     end 
 
     def sit(index, u)
-        index = self.seats.find_index(nil) if !index
+        index = self.seats.find_index(nil) if !index #find first seat avail
         if !self.seats[index]
             self.users << u
             self.seats[index] = u.id
             self.save
-        end #if index == nil, find first seat avail
+        end 
     end
 
     def unsit(u)
@@ -27,10 +25,6 @@ class Game < ApplicationRecord
         self.seats[index] = nil if index # if user was found
         self.users.delete(u)
         self.save
-    end
-
-    def self.BIG_BLIND
-        BIG_BLIND
     end
 
     def seats_as_users
@@ -49,7 +43,6 @@ class Game < ApplicationRecord
         end
 
         self.rounds.build(small_blind_index: new_index, big_blind: self.big_blind).tap do |new_round|
-        # self.rounds.build(small_blind_index: 0).tap do |new_round|
             new_round.save
             new_round.start
         end
@@ -57,16 +50,10 @@ class Game < ApplicationRecord
     end
 
     def startable
-        if !self.active_round  || (self.users.count > 1 && !self.active_round.is_playing && self.players_have_enough_money?)
-            return true
-        end
-        false
+        (!self.active_round  || (self.users.count > 1 && !self.active_round.is_playing && self.players_have_enough_money?)) ? true : false
     end
 
     def players_have_enough_money?
-        self.users.each do |u|
-            return false if u.chips < BIG_BLIND
-        end
-        true
+        self.users.each {|u| return false if u.chips < self.big_blind }
     end
 end
