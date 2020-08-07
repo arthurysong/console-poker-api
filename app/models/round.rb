@@ -32,29 +32,14 @@ class Round < ApplicationRecord
         super(only: [:id, :pot, :highest_bet_for_phase, :is_playing, :phase, :result, :big_blind], methods: [:access_community_cards, :turn])
     end 
 
-    # def ordered_users
-    #     self.users.sort{|a,b| a.id <=> b.id}
-    # end
-
     def turn 
-        return User.find(self.seats[self.turn_index]) if self.is_playing
-        # return active_players[self.turn_index] if self.is_playing
-        nil
+        self.is_playing ? User.find(self.seats[self.turn_index]) : nil
     end
 
     def turn= (user)
-        self.seats.each_with_index do |u, i|
-            if user.id == u
-                self.turn_index = i
-                self.save
-                break
-            end
-        end
+        self.turn_index = self.seats.find_index(user.id)
+        self.save
     end
-
-    # def active_players
-    #     self.users.select {|player| player.playing }.sort{|a, b| a.id <=> b.id}
-    # end
 
     def access_community_cards
         case self.phase
