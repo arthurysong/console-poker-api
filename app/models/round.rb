@@ -178,6 +178,14 @@ class Round < ApplicationRecord
         self.save
     end
 
+    def check_if_over
+        counter = 0
+        player_ids.each do |id|
+            counter += 1 if User.find(id).playing
+            return false if counter == 2
+        end
+    end
+
     def make_player_move(command, amount = 0, blinds = false)
         # These variables I need when I broadcast to ActionCable
         u = turn 
@@ -226,7 +234,7 @@ class Round < ApplicationRecord
 
         ActionCable.server.broadcast("game_#{game.id}", { type: "new_move", turn_index: turn_index, command: command, moved_user: u, }) if !blinds 
 
-        if player_ids.count == 1
+        if check_if_over
             end_game_by_fold
         elsif phase_finished?
             initiate_next_phase
@@ -240,7 +248,9 @@ class Round < ApplicationRecord
     end
 
     def make_marley_move
+        # binding.pry
         if self.game.id == 1
+            puts turn
             u = turn
             if u && u.id == 1
                 sleep 1.5
@@ -314,7 +324,9 @@ class Round < ApplicationRecord
 
 
     def end_game_by_fold
-        last_player = User.find(self.active_player_ids[0])
+        last_player = User.find(player_ids.detect{|p| User.find(p).playing})
+
+        # last_player = User.find(self.active_player_ids[0])
         last_player.chips += self.pot
         last_player.winnings = self.pot
         last_player.save
