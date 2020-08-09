@@ -1,7 +1,7 @@
 class GamesController < ApplicationController
-    def join_game(seat_index = nil)
+    def join_game
         game = Game.find(params[:id])
-        game.sit(seat_index, @current_user)
+        game.sit(params["index"], @current_user)
         @current_user.save
 
         ActionCable.server.broadcast("game_#{game.id}", { type: "user_join", game: game })
@@ -27,10 +27,10 @@ class GamesController < ApplicationController
             ActionCable.server.broadcast("game_#{game.id}", { type: "errors", error: "Game must have more than one player." })
             render json: { error: "Game must have more than one player." }
         elsif !game.players_have_enough_money?
-            ActionCable.server.broadcast("game_#{game.id}", { type: "errors", error: "All players must be able to afford Big Blind: #{Game.BIG_BLIND}." })
+            ActionCable.server.broadcast("game_#{game.id}", { type: "errors", error: "All players must be able to afford Big Blind: #{Game.big_blind}." })
             render json: { error: "All players must be able to afford Big Blind" }
         elsif !game.active_round || !game.active_round.is_playing
-
+            puts 'did i get here?'
             game.start
             game = Game.find(params[:id]) #For some reason, I need to grab the game again...
 
@@ -43,7 +43,9 @@ class GamesController < ApplicationController
                 u.call_or_check
             end
 
+            puts 'i got here??'
             render json: { success: "New Round started" }
+
         else
             ActionCable.server.broadcast("game_#{game.id}", { type: "errors", error: "Round is still playing." })
             render json: { error: "Round is still playing." }

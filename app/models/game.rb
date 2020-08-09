@@ -35,18 +35,28 @@ class Game < ApplicationRecord
         self.rounds.last
     end
 
-    def start
-        new_index = 0
-        if self.active_round
-            last_blind_index = self.active_round.small_blind_index
-            new_index = (last_blind_index + 1) % self.users.count
+    def find_new_sbi # determines next small_blind_index
+        if r = self.active_round
+            new_index = r.small_blind_index
+            while !self.seats[new_index] || new_index == r.small_blind_index
+                new_index = (new_index + 1) % 8
+            end
+        else
+            new_index = 0
+            while !self.seats[new_index]
+                new_index += 1
+            end
         end
+        new_index
+    end
 
-        self.rounds.build(small_blind_index: new_index, big_blind: self.big_blind).tap do |new_round|
-            new_round.save
-            new_round.start
-        end
-        self.save
+    def start
+        new_round = self.rounds.create(small_blind_index: find_new_sbi, big_blind: self.big_blind)
+        # self.save # Need to make sure to save before starting, because round needs to know the game it belongs to.
+
+        new_round.start
+        # puts 'hello?'
+        # self.save
     end
 
     def startable

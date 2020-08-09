@@ -1,4 +1,5 @@
 require 'pry'
+
 class User < ApplicationRecord
     has_secure_password
     belongs_to :room, optional: true
@@ -31,7 +32,10 @@ class User < ApplicationRecord
         self.dealer = false
         self.winnings = 0
         self.checked = false
+        # binding.pry
+        # puts 'why??'
         self.save
+        # puts 'Hello??'
     end
 
     def call_or_check
@@ -41,7 +45,10 @@ class User < ApplicationRecord
     def set_playing(round_id)
         self.playing = true
         self.round_id = round_id
+        self.save
+
         reset_user
+        # puts 'after set_playing'
     end
 
     def connected
@@ -69,12 +76,9 @@ class User < ApplicationRecord
         end
     end
 
-    def is_move_valid?
-        self.round && self.round.turn == self
-    end
-
     def make_move(move, amount = 0, blinds = false)
-        self.round.make_player_move(move, amount, blinds) if is_move_valid?
+        r = self.round
+        r.make_player_move(move, amount, blinds) if r && r.turn == self
     end
 
     def leave_round

@@ -30,7 +30,6 @@ class PaymentsController < ApplicationController
         user = @current_user
         save_account_id(connected_account_id, user)
 
-        # Render some HTML or redirect to a different page.
         render json: { success: true, user: user }, status: 200
     end
 
