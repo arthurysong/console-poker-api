@@ -35,13 +35,6 @@ class UsersController < ApplicationController
         end
     end
 
-    # def marley_call
-    #     user = User.find_by(username: "Marley")
-    #     user.call_or_check
-
-    #     render json: { message: "Move Success." }
-    # end
-
     def get_chips
         chips = @current_user.chips
         render json: { chips: chips }, status: 200

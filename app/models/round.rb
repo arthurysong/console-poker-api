@@ -244,7 +244,7 @@ class Round < ApplicationRecord
         
         self.save
         
-        make_marley_move if !blinds
+        make_marley_move if !blinds && self.is_playing
     end
 
     def make_marley_move
@@ -336,7 +336,7 @@ class Round < ApplicationRecord
 
         ActionCable.server.broadcast("game_#{self.game.id}", { 
                 type: "game_end_by_fold",
-                winner_ids: { [last_player.id] => true } 
+                winner_id: { last_player.id => true } 
             }) 
     end
 end
