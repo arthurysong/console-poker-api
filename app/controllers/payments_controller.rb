@@ -26,17 +26,17 @@ class PaymentsController < ApplicationController
             render json: {error: 'An unknown error occurred.'}, status: 500
         end
 
-        connected_account_id = response.stripe_user_id
-        user = @current_user
-        save_account_id(connected_account_id, user)
+        # connected_account_id = response.stripe_user_id
+        @current_user.connect_account_id = response.stripe_user_id
+        @current_user.save
 
-        render json: { success: true, user: user }, status: 200
+        render json: { success: true, user_id: @current_user.id }, status: 200
     end
 
-    def save_account_id(connect_id, user)
-        user.connect_account_id = connect_id
-        user.save
-    end
+    # def save_account_id(connect_id, user)
+    #     user.connect_account_id = connect_id
+    #     user.save
+    # end
     
     def secret
         amount = params[:amount].delete(',').to_i
