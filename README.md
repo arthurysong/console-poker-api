@@ -1,24 +1,11 @@
 # Console-Poker
 
-Console-poker is an online Poker application that supports real-time chatting and USD transactions! Users sign up, deposit funds, join a room, and play No-Limit Texas Holdem. Once you're done playing, head back to the bank to withdraw your winnings!
+## Screenshot
 
-This repository contains the Back End part of the stack (Rails API)!  
+![screenshot](console-poker.webp)
 
-For the Front End, see: https://github.com/atribecalledarty/console-poker-frontend  
-To see the fully Deployed Application, Visit: https://console-poker.herokuapp.com
+## Description
 
-Test User:  
-Email: fudge@gmail.com  
-Password: 123456
+Ruby on Rails API for [Console-Poker](https://console-poker.herokuapp.com/)
 
-Card Details:  
-Name: Any Name  
-4242 4242 4242 4242  
-EXP Date: Any future date  
-Zip Code: Any Zipcode
-
-## Set Up
-1. Clone the application: `git clone`
-2. Install required gems: `bundle install`
-3. Create, Migrate, and Seed DB: `rake db:create`, `rake db:migrate`, `rake db:seed`
-4. Run rails server: `rails s`
+[Client Repo](https://github.com/arthurysong/console-poker-frontend)
