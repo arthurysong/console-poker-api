@@ -50,10 +50,8 @@ class PaymentsController < ApplicationController
     end
 
     def transfer_secret
-        amount = params[:amount].delete(',').to_i
+        chips = params[:amount].delete(',').to_i * 100
         user = @current_user
-
-        chips = amount * 100
 
         if user.chips < chips
             render json: { error: "User does not have enough chips" }, status: 400
@@ -61,12 +59,12 @@ class PaymentsController < ApplicationController
             user.chips -= chips
             user.save
             transfer = Stripe::Transfer.create({
-                amount: amount,
+                amount: chips / 100,
                 currency: "usd",
                 destination: user.connect_account_id
             })
 
-            render json: { success: true, message: "#{chips} chips exchanged! USD amount will be transferred to debit/bank.", user: user }
+            render json: { success: true, message: "#{chips} chips exchanged! USD amount will be transferred to connected account in 7-10 business days.", chip_change: chips }
         end
     end
 

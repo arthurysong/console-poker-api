@@ -9,7 +9,7 @@ class AuthenticationController < ApplicationController
         if user_params[:site]
             user = User.find_or_create_by_email(user_params[:email], user_params[:username])
             token = JsonWebToken.encode(user_id: user.id)
-            render json: { auth_token: token, user: user }
+            render json: { auth_token: token, user: AuthUserSerializer.new(user).serializable_hash }
         else
             command = AuthenticateUser.call(user_params[:email], user_params[:password])
             if command.success?
@@ -27,7 +27,7 @@ class AuthenticationController < ApplicationController
             # render json: { user: @current_user }
             render json: AuthUserSerializer.new(@current_user).serializable_hash
         else 
-            render json: { error: 'Not Authorized' }, status: 401
+            render json: { error: 'Invalid token' }, status: 401
         end
     end
 
