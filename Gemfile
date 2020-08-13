@@ -32,6 +32,7 @@ gem 'simple_command'
 gem 'rack-cors'
 gem 'omniauth-google-oauth2'
 gem 'figaro'
+gem 'fast_jsonapi'
 
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'

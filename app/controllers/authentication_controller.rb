@@ -13,7 +13,8 @@ class AuthenticationController < ApplicationController
         else
             command = AuthenticateUser.call(user_params[:email], user_params[:password])
             if command.success?
-                render json: { auth_token: command.result[:token], user: command.result[:user] }
+                render json: { auth_token: command.result[:token], user: AuthUserSerializer.new(command.result[:user]).serializable_hash }
+                # render json: { auth_token: command.result[:token], user: command.result[:user] }
             else
                 render json: { errors: command.errors[:user_authentication] }, status: :unauthorized
             end
@@ -23,7 +24,8 @@ class AuthenticationController < ApplicationController
     def set_login
         @current_user = AuthorizeApiRequest.call(request.headers).result
         if @current_user 
-            render json: { user: @current_user }
+            # render json: { user: @current_user }
+            render json: AuthUserSerializer.new(@current_user).serializable_hash
         else 
             render json: { error: 'Not Authorized' }, status: 401
         end

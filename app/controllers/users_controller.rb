@@ -3,10 +3,10 @@ require 'pry'
 class UsersController < ApplicationController
     skip_before_action :authenticate_request, only: :create
 
-    def index
-        users = User.all
-        render json: users
-    end
+    # def index
+    #     users = User.all
+    #     render json: users
+    # end # we're not using this action
 
     def create
         user = User.new(user_params)
