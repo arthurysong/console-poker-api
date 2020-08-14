@@ -319,9 +319,15 @@ class Round < ApplicationRecord
             # new community cards
             # new pot
             # new turn
+
+            # also need to update each player's card rank
             sleep 0.80
-            ActionCable.server.broadcast("game_#{game.id}", { type: "next_betting_phase", access_community_cards: access_community_cards, pot: self.pot, phase: self.phase, turn_as_json: turn_as_json })
+            ActionCable.server.broadcast("game_#{game.id}", { type: "next_betting_phase", access_community_cards: access_community_cards, pot: self.pot, phase: self.phase, turn_as_json: turn_as_json, seats_current_hand: seats_current_hand })
         end
+    end
+
+    def seats_current_hand
+        self.seats.map{|id| id ? User.find(id).current_hand : nil}
     end
 
     def showdown
