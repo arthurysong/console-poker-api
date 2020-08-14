@@ -6,7 +6,7 @@ class GameChannel < ApplicationCable::Channel
     stream_from "game_#{game.id}"
 
     # ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: GameSerializer.new(game).serializable_hash })
-    ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
+    ActionCable.server.broadcast("game_#{game.id}", { type: "subscribed", game: game })
   end
 
   def unsubscribed
@@ -22,6 +22,6 @@ class GameChannel < ApplicationCable::Channel
 
     stop_all_streams
 
-    ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
+    ActionCable.server.broadcast("game_#{game.id}", { type: "unsubscribed", game: game })
   end
 end

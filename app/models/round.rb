@@ -77,7 +77,7 @@ class Round < ApplicationRecord
 
     def start
         # self.status << "ROUND STARTING"
-        puts "ALLOOOO??"
+        # puts "ALLOOOO??"
         self.game.users.each {|p| p.set_playing(self.id) }
 
         # puts 'hiiiiii'
@@ -184,6 +184,11 @@ class Round < ApplicationRecord
 
         self.turn_count += 1 unless blinds
         self.save
+
+        if !blinds && self.is_playing && !phase_finished? && !check_if_over
+            sleep 0.80
+            ActionCable.server.broadcast("game_#{game.id}", { type: "update_turn", turn_as_json: turn_as_json })
+        end
     end
 
     def check_if_over
@@ -204,13 +209,13 @@ class Round < ApplicationRecord
             u.playing = false
             u.save
 
-            next_turn
+            # next_turn
         when 'check'
             if self.highest_bet_for_phase == 0 || u.round_bet == self.highest_bet_for_phase
                 u.checked = true
                 u.save
 
-                next_turn
+                # next_turn
             end
         when 'call'
             if self.highest_bet_for_phase > u.round_bet || self.highest_bet_for_phase == 0
@@ -221,7 +226,7 @@ class Round < ApplicationRecord
 
                 self.all_in = true if u.chips == 0
                 self.pot += chip_change
-                next_turn
+                # next_turn
             end
         when 'raise'
             if can_players_afford?(amount) && amount > self.highest_bet_for_phase
@@ -234,13 +239,23 @@ class Round < ApplicationRecord
                 self.pot += chip_change
                 self.highest_bet_for_phase = amount
 
-                next_turn(blinds)
+                # next_turn(blinds)
             end
         when 'allin'
-            u.make_move('raise', max_raise_level)
+            chip_change = max_raise_level - u.round_bet
+            u.round_bet = max_raise_level
+            u.chips -= chip_change
+            u.save
+
+            self.all_in = true
+            self.pot += chip_change
+            self.highest_bet_for_phase = max_raise_level
+            # u.make_move('raise', max_raise_level)
         end
 
         ActionCable.server.broadcast("game_#{game.id}", { type: "new_move", turn_index: turn_index, command: command, moved_user: GameUserSerializer.new(u).serializable_hash, }) if !blinds 
+
+        next_turn(blinds)
 
         if check_if_over
             end_game_by_fold
@@ -248,10 +263,14 @@ class Round < ApplicationRecord
             initiate_next_phase
         end
 
-        if !blinds && self.is_playing
-            sleep 0.80
-            ActionCable.server.broadcast("game_#{game.id}", { type: "update_game_after_move", game: game })
-        end
+        # if !blinds && self.is_playing
+        #     sleep 0.80
+        #     # what do I actually need to send here?
+        #     # new turn? 
+        #     # I need new pot
+        #     # new phase
+        #     ActionCable.server.broadcast("game_#{game.id}", { type: "update_game_after_move", game: game })
+        # end
         
         self.save
         
@@ -296,21 +315,33 @@ class Round < ApplicationRecord
         else
             self.phase += 1
             start_betting_round
+            # new phase, 
+            # new community cards
+            # new pot
+            # new turn
+            sleep 0.80
+            ActionCable.server.broadcast("game_#{game.id}", { type: "next_betting_phase", access_community_cards: access_community_cards, pot: self.pot, phase: self.phase, turn_as_json: turn_as_json })
         end
     end
 
     def showdown
         best_hands = []
+        best_indices = []
         best_players = []
 
-        active_player_ids.each_with_index do |id, index|
+        seats.each_with_index do |id, index|
+            next if id == nil
+            
+        # active_player_ids.each_with_index do |id, index|
             player = User.find(id)
             hand = PokerHand.new(player.cards + " " + self.community_cards)
-            if index == 0 || hand == best_hands[0]
+            if best_hands == [] || hand == best_hands[0]
                 best_hands << hand
+                best_indices << index
                 best_players << player
             elsif hand > best_hands[0]
                 best_hands = [hand]
+                best_indices = [index]
                 best_players = [player]
             end
         end
@@ -324,13 +355,17 @@ class Round < ApplicationRecord
             player.save
         end
 
-        ActionCable.server.broadcast("game_#{self.game.id}", { 
-                type: "game_end_by_showdown",
-                winner_ids: best_ids 
-            })
-
         self.is_playing = false
         self.save
+        # I need to return startable, winner_indices, winnings
+        sleep 0.80
+        ActionCable.server.broadcast("game_#{self.game.id}", { 
+                type: "game_end_by_showdown",
+                startable: self.game.startable,
+                winner_indices: best_indices,
+                winnings: split,
+                winner_ids: best_ids 
+            })
     end
 
 
@@ -346,6 +381,7 @@ class Round < ApplicationRecord
         self.is_playing = false
         self.save
 
+        sleep 0.80
         ActionCable.server.broadcast("game_#{self.game.id}", { 
                 type: "game_end_by_fold",
                 startable: self.game.startable,
