@@ -17,7 +17,7 @@ class User < ApplicationRecord
 
     def as_json(options = {})
         super(methods: [:connected, :possible_moves, :current_hand])
-    end 
+    end
 
     def current_hand # Formatting the rank method for PokerHand
         if self.round && self.cards && self.round.access_community_cards != "" 

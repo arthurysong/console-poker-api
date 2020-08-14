@@ -4,6 +4,7 @@ class GamesController < ApplicationController
         game.sit(params["index"], @current_user)
         @current_user.save
 
+        # ActionCable.server.broadcast("game_#{game.id}", { type: "user_join", game: game })
         ActionCable.server.broadcast("game_#{game.id}", { type: "user_join", game: game })
         render json: { success: "#{@current_user.username} has joined game.", game_id: game.id }, status: 201
     end

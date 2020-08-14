@@ -28,7 +28,7 @@ class Game < ApplicationRecord
     end
 
     def seats_as_users
-        self.seats.map{|id| User.find(id) if id}
+        self.seats.map{|id| GameUserSerializer.new(User.find(id)).serializable_hash if id}
     end
     
     def active_round
