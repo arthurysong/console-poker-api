@@ -336,10 +336,11 @@ class Round < ApplicationRecord
         best_players = []
 
         seats.each_with_index do |id, index|
-            next if id == nil
+            next if id == nil 
             
         # active_player_ids.each_with_index do |id, index|
             player = User.find(id)
+            next if !player.playing
             hand = PokerHand.new(player.cards + " " + self.community_cards)
             if best_hands == [] || hand == best_hands[0]
                 best_hands << hand

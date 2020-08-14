@@ -2,11 +2,7 @@ require 'pry'
 
 class GameChannel < ApplicationCable::Channel
   def subscribed
-    # game = Game.find(params["game"])
     stream_from "game_#{params["game"]}"
-
-    # ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: GameSerializer.new(game).serializable_hash })
-    # ActionCable.server.broadcast("game_#{game.id}", { type: "subscribed", game: game })
   end
 
   def unsubscribed
@@ -21,7 +17,5 @@ class GameChannel < ApplicationCable::Channel
     user.save
 
     stop_all_streams
-
-    # ActionCable.server.broadcast("game_#{game.id}", { type: "unsubscribed", game: game })
   end
 end
