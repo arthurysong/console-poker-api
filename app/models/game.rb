@@ -56,8 +56,7 @@ class Game < ApplicationRecord
         # self.save # Need to make sure to save before starting, because round needs to know the game it belongs to.
 
         new_round.start
-        # puts 'hello?'
-        # self.save
+        self.save
     end
 
     def startable

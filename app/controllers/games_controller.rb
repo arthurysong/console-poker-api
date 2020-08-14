@@ -30,9 +30,10 @@ class GamesController < ApplicationController
             ActionCable.server.broadcast("game_#{game.id}", { type: "errors", error: "All players must be able to afford Big Blind: #{Game.big_blind}." })
             render json: { error: "All players must be able to afford Big Blind" }
         elsif !game.active_round || !game.active_round.is_playing
-            puts 'did i get here?'
+            # puts 'did i get here?'
             game.start
-            game = Game.find(params[:id]) #For some reason, I need to grab the game again...
+            # game.save
+            # game = Game.find(params[:id]) #For some reason, I need to grab the game again...
 
             ActionCable.server.broadcast("game_#{game.id}", { type: "start_game", game: game })
 

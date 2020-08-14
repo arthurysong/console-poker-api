@@ -233,7 +233,7 @@ class Round < ApplicationRecord
             u.make_move('raise', max_raise_level)
         end
 
-        ActionCable.server.broadcast("game_#{game.id}", { type: "new_move", turn_index: turn_index, command: command, moved_user: u, }) if !blinds 
+        ActionCable.server.broadcast("game_#{game.id}", { type: "new_move", turn_index: turn_index, command: command, moved_user: GameUserSerializer.new(u).serializable_hash, }) if !blinds 
 
         if check_if_over
             end_game_by_fold
