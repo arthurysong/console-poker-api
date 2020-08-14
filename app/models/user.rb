@@ -2,6 +2,7 @@ require 'pry'
 
 class User < ApplicationRecord
     has_secure_password
+    validates :email, uniqueness: true
     belongs_to :room, optional: true
     belongs_to :game, optional: true
     belongs_to :round, optional: true

@@ -17,7 +17,7 @@ class Round < ApplicationRecord
     #all_in
     #seats
     #status (removed)
-    #result
+    #result (removed)
     #big_blind
 
     PRE_FLOP = 0
@@ -26,7 +26,8 @@ class Round < ApplicationRecord
     RIVER = 3
 
     def as_json(options = {})
-        super(only: [:id, :pot, :highest_bet_for_phase, :is_playing, :phase, :result, :big_blind], methods: [:access_community_cards, :turn])
+        # super(only: [:id, :pot, :highest_bet_for_phase, :is_playing, :phase, :result, :big_blind], methods: [:access_community_cards, :turn])
+        super(only: [:id, :pot, :highest_bet_for_phase, :is_playing, :big_blind], methods: [:access_community_cards, :turn])
     end 
 
     def turn 

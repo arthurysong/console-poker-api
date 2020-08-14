@@ -12,16 +12,17 @@ class UsersController < ApplicationController
         user = User.new(user_params)
         
         if user.save
-            render json: { user: user }, status: 201
+            token = JsonWebToken.encode(user_id: user.id)
+            render json: { auth_token: token, user: AuthUserSerializer.new(user).serializable_hash }, status: 201
         else 
             render json: { errors: user.errors.full_messages }, status: 400
         end
     end
 
-    def reset_user
-        @current_user.reset_user
-        render json: { success: "#{@current_user.username} has returned their cards, and reset info.", user: @current_user }, status: 201
-    end
+    # def reset_user
+    #     @current_user.reset_user
+    #     render json: { success: "#{@current_user.username} has returned their cards, and reset info.", user: @current_user }, status: 201
+    # end
 
     def make_move
         game = @current_user.game

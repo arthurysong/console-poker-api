@@ -5,6 +5,7 @@ class GameChannel < ApplicationCable::Channel
     game = Game.find(params["game"])
     stream_from "game_#{game.id}"
 
+    # ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: GameSerializer.new(game).serializable_hash })
     ActionCable.server.broadcast("game_#{game.id}", { type: "set_game", game: game })
   end
 

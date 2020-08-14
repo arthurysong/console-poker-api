@@ -7,7 +7,7 @@ class Game < ApplicationRecord
     #big_blind
 
     def as_json(options = {})
-        super(only: [:id, :seats, :big_blind], methods: [:active_round, :seats_as_users, :startable], include: [:users])
+        super(only: [:id, :big_blind], methods: [:active_round, :seats_as_users, :startable], include: [:users])
     end 
 
     def sit(index, u)
