@@ -22,6 +22,6 @@ class GameChannel < ApplicationCable::Channel
 
     stop_all_streams
 
-    ActionCable.server.broadcast("game_#{game.id}", { type: "unsubscribed", game: game })
+    # ActionCable.server.broadcast("game_#{game.id}", { type: "unsubscribed", game: game })
   end
 end
