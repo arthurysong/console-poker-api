@@ -27,8 +27,12 @@ class Round < ApplicationRecord
 
     def as_json(options = {})
         # super(only: [:id, :pot, :highest_bet_for_phase, :is_playing, :phase, :result, :big_blind], methods: [:access_community_cards, :turn])
-        super(only: [:id, :pot, :highest_bet_for_phase, :is_playing, :big_blind], methods: [:access_community_cards, :turn])
+        super(only: [:id, :pot, :highest_bet_for_phase, :is_playing, :phase, :big_blind], methods: [:access_community_cards, :turn_as_json])
     end 
+
+    def turn_as_json
+        turn.as_json(only: [:id], methods: [:possible_moves]) if turn
+    end
 
     def turn 
         self.is_playing ? User.find(self.seats[self.turn_index]) : nil
@@ -117,7 +121,10 @@ class Round < ApplicationRecord
         self.users.delete(user)
         self.save
 
-        end_game_by_fold if check_if_over
+        if check_if_over
+            end_game_by_fold 
+            ActionCable.server.broadcast("game_#{self.game.id}", { type: "round_ended_due_to_leaver" })
+        end
     end
 
     def set_cards
@@ -241,7 +248,10 @@ class Round < ApplicationRecord
             initiate_next_phase
         end
 
-        ActionCable.server.broadcast("game_#{game.id}", { type: "update_game_after_move", game: game }) if !blinds
+        if !blinds && self.is_playing
+            sleep 0.80
+            ActionCable.server.broadcast("game_#{game.id}", { type: "update_game_after_move", game: game })
+        end
         
         self.save
         
@@ -254,7 +264,7 @@ class Round < ApplicationRecord
             puts turn
             u = turn
             if u && u.id == 1
-                sleep 1.5
+                sleep 1
                 u.call_or_check
             end
         end
@@ -325,7 +335,8 @@ class Round < ApplicationRecord
 
 
     def end_game_by_fold
-        last_player = User.find(player_ids.detect{|p| User.find(p).playing})
+        index = self.seats.index{|p| User.find(p).playing }
+        last_player = User.find(self.seats[index])
 
         # last_player = User.find(self.active_player_ids[0])
         last_player.chips += self.pot
@@ -337,7 +348,10 @@ class Round < ApplicationRecord
 
         ActionCable.server.broadcast("game_#{self.game.id}", { 
                 type: "game_end_by_fold",
-                winner_id: { last_player.id => true } 
+                startable: self.game.startable,
+                winner_index: index,
+                winnings: self.pot,
+                winner_ids: { last_player.id => true } 
             }) 
     end
 end

@@ -30,21 +30,19 @@ class GamesController < ApplicationController
             ActionCable.server.broadcast("game_#{game.id}", { type: "errors", error: "All players must be able to afford Big Blind: #{Game.big_blind}." })
             render json: { error: "All players must be able to afford Big Blind" }
         elsif !game.active_round || !game.active_round.is_playing
-            # puts 'did i get here?'
             game.start
-            # game.save
-            # game = Game.find(params[:id]) #For some reason, I need to grab the game again...
 
             ActionCable.server.broadcast("game_#{game.id}", { type: "start_game", game: game })
 
             # Put in move for marley, because Marley only responds to moves that are !blind
+            # u = game.active_round.turn
             u = game.active_round.turn
             if u && u.username == "Marley"
                 sleep 1.5
                 u.call_or_check
             end
 
-            puts 'i got here??'
+            # puts 'i got here??'
             render json: { success: "New Round started" }
 
         else
