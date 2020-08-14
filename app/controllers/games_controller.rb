@@ -4,7 +4,6 @@ class GamesController < ApplicationController
         game.sit(params["index"], @current_user)
         @current_user.save
 
-        # ActionCable.server.broadcast("game_#{game.id}", { type: "user_join", game: game })
         ActionCable.server.broadcast("game_#{game.id}", { type: "user_join", startable: game.startable, seat_index: params["index"], user: GameUserSerializer.new(@current_user).serializable_hash })
         render json: { success: "#{@current_user.username} has joined game.", game_id: game.id }, status: 201
     end
@@ -13,13 +12,13 @@ class GamesController < ApplicationController
         game = Game.find(params[:id])
 
         @current_user.round.player_has_left(@current_user) if @current_user.round && @current_user.round.is_playing
-        game.unsit(@current_user)
+        i = game.unsit(@current_user)
         @current_user.game_id = nil
         @current_user.reset_user
         @current_user.save
         
-        ActionCable.server.broadcast("game_#{game.id}", { type: "user_leave", game: game })
-        render json: { success: "#{@current_user.username} has left the game.", user: @current_user }, status: 201
+        ActionCable.server.broadcast("game_#{game.id}", { type: "user_leave", startable: game.startable, seat_index: i })
+        head :accepted
     end
 
     def start

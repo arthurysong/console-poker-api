@@ -25,6 +25,7 @@ class Game < ApplicationRecord
         self.seats[index] = nil if index # if user was found
         self.users.delete(u)
         self.save
+        index # need to return so that in games#action, I can return the index that is empty 
     end
 
     def seats_as_users
