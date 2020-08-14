@@ -51,4 +51,8 @@ class GamesController < ApplicationController
         end
     end
 
+    def show
+        g = Game.find(params[:id])
+        render json: g, status: :ok
+    end
 end
