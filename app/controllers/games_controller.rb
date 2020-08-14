@@ -5,7 +5,7 @@ class GamesController < ApplicationController
         @current_user.save
 
         # ActionCable.server.broadcast("game_#{game.id}", { type: "user_join", game: game })
-        ActionCable.server.broadcast("game_#{game.id}", { type: "user_join", game: game })
+        ActionCable.server.broadcast("game_#{game.id}", { type: "user_join", startable: game.startable, seat_index: params["index"], user: GameUserSerializer.new(@current_user).serializable_hash })
         render json: { success: "#{@current_user.username} has joined game.", game_id: game.id }, status: 201
     end
 
