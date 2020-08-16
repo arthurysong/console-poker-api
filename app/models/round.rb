@@ -115,8 +115,6 @@ class Round < ApplicationRecord
     end
 
     def player_has_left(user) # this will get reworked once i change the arrays around ...
-        next_turn if turn == user
-
         self.seats[self.seats.find_index(user.id)] = nil
         self.users.delete(user)
         self.save
@@ -124,6 +122,8 @@ class Round < ApplicationRecord
         if check_if_over
             end_game_by_fold 
             ActionCable.server.broadcast("game_#{self.game.id}", { type: "round_ended_due_to_leaver" })
+        else
+            next_turn if turn == user
         end
     end
 

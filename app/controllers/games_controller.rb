@@ -10,14 +10,17 @@ class GamesController < ApplicationController
 
     def leave_game
         game = Game.find(params[:id])
+        i = game.unsit(@current_user)
+        # i = self.seats.find_index(u.id)
+        ActionCable.server.broadcast("game_#{game.id}", { type: "user_leave", startable: game.startable, seat_index: i })
 
         @current_user.round.player_has_left(@current_user) if @current_user.round && @current_user.round.is_playing
-        i = game.unsit(@current_user)
+        # i = game.unsit(@current_user)
         @current_user.game_id = nil
         @current_user.reset_user
         @current_user.save
         
-        ActionCable.server.broadcast("game_#{game.id}", { type: "user_leave", startable: game.startable, seat_index: i })
+        # ActionCable.server.broadcast("game_#{game.id}", { type: "user_leave", startable: game.startable, seat_index: i })
         head :accepted
     end
 
