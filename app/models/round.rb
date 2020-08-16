@@ -368,10 +368,12 @@ class Round < ApplicationRecord
         sleep 0.80
         ActionCable.server.broadcast("game_#{self.game.id}", { 
                 type: "game_end_by_showdown",
+                access_community_cards: access_community_cards,
                 startable: self.game.startable,
                 winner_indices: best_indices,
                 winnings: split,
-                winner_ids: best_ids 
+                winner_ids: best_ids,
+                seats_current_hand: seats_current_hand 
             })
     end
 
