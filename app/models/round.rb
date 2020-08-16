@@ -115,17 +115,43 @@ class Round < ApplicationRecord
     end
 
     def player_has_left(user) # this will get reworked once i change the arrays around ...
-        self.seats[self.seats.find_index(user.id)] = nil
+        index = self.seats.find_index(user.id)
+
+        self.seats[index] = nil
         self.users.delete(user)
         self.save
 
-        if check_if_over
-            end_game_by_fold 
-            ActionCable.server.broadcast("game_#{self.game.id}", { type: "round_ended_due_to_leaver" })
-        else
-            next_turn if turn == user
+        if !check_if_over && turn_index == index
+            next_turn
+            initiate_next_phase if phase_finished?
+            make_marley_move
+            # phase_finished?  initiate_next_phase : make_marley_move
+        elsif check_if_over
+            end_game_by_fold
         end
     end
+
+    # def end_game_by_leave
+    #     index = self.seats.index{|p| User.find(p).playing }
+    #     last_player = User.find(self.seats[index])
+
+    #     # last_player = User.find(self.active_player_ids[0])
+    #     last_player.chips += self.pot
+    #     last_player.winnings = self.pot
+    #     last_player.save
+
+    #     self.is_playing = false
+    #     self.save
+
+    #     sleep 0.80
+    #     ActionCable.server.broadcast("game_#{self.game.id}", { 
+    #             type: "game_end_by_leave",
+    #             startable: self.game.startable,
+    #             winner_index: index,
+    #             winnings: self.pot,
+    #             winner_ids: { last_player.id => true } 
+    #         }) 
+    # end
 
     def set_cards
         # self.status << "...Dealing cards..."
@@ -189,6 +215,7 @@ class Round < ApplicationRecord
             sleep 0.80
             ActionCable.server.broadcast("game_#{game.id}", { type: "update_turn", turn_as_json: turn_as_json })
         end
+
     end
 
     def check_if_over
@@ -323,6 +350,7 @@ class Round < ApplicationRecord
             # also need to update each player's card rank
             sleep 0.80
             ActionCable.server.broadcast("game_#{game.id}", { type: "next_betting_phase", access_community_cards: access_community_cards, pot: self.pot, phase: self.phase, turn_as_json: turn_as_json, seats_current_hand: seats_current_hand })
+            # make_marley_move
         end
     end
 
