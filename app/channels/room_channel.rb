@@ -8,7 +8,7 @@ class RoomChannel < ApplicationCable::Channel
     room.users << user
     user.save
 
-    ActionCable.server.broadcast("room_#{room.id}", { type: "current_room", room: room })
+    # ActionCable.server.broadcast("room_#{room.id}", { type: "current_room", room: room })
 
     rooms = Room.all
     ActionCable.server.broadcast("rooms", { type: "current_rooms", rooms: rooms }) 
