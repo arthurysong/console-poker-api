@@ -6,8 +6,15 @@ class RoomsController < ApplicationController
         render json: rooms
     end
 
-    def show
+    def show # THIS ACTION IS FOR WHEN USER JOINS A ROOM AND INITIAL FETCH
+        # WILL ALSO ADD USER TO THE ROOM
+        
         room = Room.find(params[:id])
+        room.users << @current_user
+        room.save
+
+        ActionCable.server.broadcast("room_#{room.id}", { type: "user_has_joined" })
+
         render json: room, status: :ok
     end
 
