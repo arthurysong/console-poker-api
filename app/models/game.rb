@@ -60,10 +60,13 @@ class Game < ApplicationRecord
     end
 
     def startable
-        (!self.active_round  || (self.users.count > 1 && !self.active_round.is_playing && self.players_have_enough_money?)) ? true : false
+        # self.users.count > 1 && !self.active_round && self.players_have_enough_money?)
+        # (self.users.count > 1 && !self.active_round && self.players_have_enough_money?)  || (self.users.count > 1 && !self.active_round.is_playing && self.players_have_enough_money?)) ? true : false
+        (self.users.count > 1 && (!self.active_round || !self.active_round.is_playing) && self.players_have_enough_money?) ? true : false
     end
 
     def players_have_enough_money?
         self.users.each {|u| return false if u.chips < self.big_blind }
+        true
     end
 end
