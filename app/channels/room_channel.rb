@@ -2,10 +2,10 @@ require 'pry'
 
 class RoomChannel < ApplicationCable::Channel
   def subscribed
+    # User has joined is broadcasted in initial fetch.
     stream_from "room_#{params["room"]}"
 
     rooms = Room.all
-    ActionCable.server.broadcast("rooms", { type: "current_rooms", rooms: rooms }) 
   end
 
   def unsubscribed
@@ -14,11 +14,10 @@ class RoomChannel < ApplicationCable::Channel
     room.users.delete(user)
     user.save
 
-    # ActionCable.server.broadcast("room_#{room.id}", { type: "current_room", room: room })
-    ActionCable.server.broadcast("room_#{room.id}", { type: "user_has_left" })
+    ActionCable.server.broadcast("room_#{room.id}", { type: "user_has_left" }) 
+    ActionCable.server.broadcast("rooms", { type: "user_has_left", room_id: room.id })
 
     rooms = Room.all
-    ActionCable.server.broadcast("rooms", { type: "current_rooms", rooms: rooms })
     stop_all_streams
   end
 end

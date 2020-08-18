@@ -3,7 +3,7 @@ require 'pry'
 class RoomsController < ApplicationController
     def index
         rooms = Room.all
-        render json: rooms
+        render json: rooms, status: :ok
     end
 
     def show # THIS ACTION IS FOR WHEN USER JOINS A ROOM AND INITIAL FETCH
@@ -14,6 +14,7 @@ class RoomsController < ApplicationController
         room.save
 
         ActionCable.server.broadcast("room_#{room.id}", { type: "user_has_joined" })
+        ActionCable.server.broadcast("rooms", { type: "user_has_joined", room_id: room.id }) 
 
         render json: room, status: :ok
     end
