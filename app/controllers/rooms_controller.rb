@@ -1,6 +1,8 @@
 require 'pry'
 
 class RoomsController < ApplicationController
+    skip_before_action :authenticate_request, only: :index
+    
     def index
         rooms = Room.all
         render json: rooms, status: :ok

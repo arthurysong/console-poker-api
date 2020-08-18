@@ -7,7 +7,7 @@ class Game < ApplicationRecord
     #big_blind
 
     def as_json(options = {})
-        super(only: [:id, :big_blind], methods: [:active_round, :seats_as_users, :startable], include: [:users])
+        super(only: [:id, :big_blind], methods: [:active_round, :seats_as_users, :startable])
     end 
 
     def sit(index, u)
@@ -60,7 +60,7 @@ class Game < ApplicationRecord
     end
 
     def startable
-        !self.active_round  || (self.users.count > 1 && !self.active_round.is_playing && self.players_have_enough_money?)
+        (!self.active_round  || (self.users.count > 1 && !self.active_round.is_playing && self.players_have_enough_money?)) ? true : false
     end
 
     def players_have_enough_money?
