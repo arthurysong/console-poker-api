@@ -9,9 +9,23 @@ marley = User.create({ username: 'Marley', email: 'dog@gmail.com', password: "12
 
 room = Room.create(name: 'Play with Marley')
 room.users << marley
-marley.save
+room.save
+
+game = Game.create(room_id: room.id)
+game.sit(nil, marley)
+game.save
 
 room2 = Room.create(name: "Let's tilt")
+game2 = Game.create(room_id: room2.id)
+
+room3 = Room.create(name: "Flatiron Cash Games")
+game3 = Game.create(room_id: room3.id)
+
+room4 = Room.create(name: "Software Engineers")
+game4 = Game.create(room_id: room4.id)
+
+room5 = Room.create(name: "EZ Money")
+game5 = Game.create(room_id: room5.id)
 
 users = User.create([
     # {username: 'sona', email: 'sona@gmail.com', password: '123456', room: room },
@@ -43,8 +57,5 @@ messages = Message.create([
     {chatbox: chatbox, user: users[3], payload: "supppp, i'm down for the forest"}
 ])
 
-game = Game.create(room_id: room.id)
-game.sit(nil, marley)
-marley.save
 
-game2 = Game.create(room_id: room2.id)
+
