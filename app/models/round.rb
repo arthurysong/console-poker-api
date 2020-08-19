@@ -390,6 +390,7 @@ class Round < ApplicationRecord
             player.save
         end
 
+        self.phase = 4
         self.is_playing = false
         self.save
         # I need to return startable, winner_indices, winnings
